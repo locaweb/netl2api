@@ -1,0 +1,23 @@
+# Python or Virtualenv files
+*.pyc
+venv
+
+# OS or editor folders
+.DS_Store
+Thumbs.db
+
+# CSM folders
+.hg
+.svn
+.CVS
+
+# Numerous always-ignore extensions
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.vi
+*~
