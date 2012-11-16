@@ -27,7 +27,7 @@ import time
 from netl2api.l2api.utils import CRLF
 from netl2api.l2api.exceptions import *
 from netl2api.l2api.transport import L2Transport
-from SystemSSH import SystemSSH, AuthenticationFailed
+from SystemSSH import SystemSSH, SSHAuthenticationFailed
 
 
 try:
@@ -58,8 +58,8 @@ class SysSSH(L2Transport):
         ssh = SystemSSH(host=self.host, port=self.port, username=self.username, passwd=self.passwd)
         try:
             ssh.open_session()
-        except AuthenticationFailed:
-            raise AuthenticationException("Authentication failed (invalid username and/or passwd)")
+        except SSHAuthenticationFailed:
+            raise SwitchAuthenticationException("SSH Authentication failed (invalid username and/or passwd)")
         return ssh
 
     def _recvall_with_timeout(self, connection=None, buff=None):

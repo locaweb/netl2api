@@ -119,6 +119,9 @@ class Flex10(L2API):
                         if not "Generating configuration" in l and \
                         not l.strip().startswith("SUCCESS:") and not l.startswith(self.prompt_mark)])
 
+    # def save_config(self):
+    #     raise NotImplementedError("Not implemented")
+
     def _show_interconnect_mods(self):
         return  self._parse_flex10_list(raw_list=self.transport.execute("show interconnect *"),
                                         eof_mark_len=45,
@@ -420,6 +423,15 @@ class Flex10(L2API):
     #     raise NotImplementedError("Not implemented")
 
     # def disable_lag(self, lag_id=None):
+    #     raise NotImplementedError("Not implemented")
+
+    # def change_interface_description(self, interface_id=None, interface_description=None):
+    #     raise NotImplementedError("Not implemented")
+
+    # def change_vlan_description(self, vlan_id=None, vlan_description=None):
+    #     raise NotImplementedError("Not implemented")
+
+    # def change_lag_description(self, lag_id=None, lag_description=None):
     #     raise NotImplementedError("Not implemented")
 
     def _destroy_network(self, vlan_id=None):

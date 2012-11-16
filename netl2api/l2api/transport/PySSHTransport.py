@@ -66,7 +66,7 @@ class PySSH(L2Transport):
                 self._ssh.connect(hostname=self.host, port=self.port, username=self.username, password=self.passwd,
                                     allow_agent=False, look_for_keys=False)
         except ssh.AuthenticationException:
-            raise AuthenticationException("Authentication failed (invalid username and/or passwd)")
+            raise SwitchAuthenticationException("Authentication failed (invalid username and/or passwd)")
         self._ssh.get_transport().set_keepalive((60))
         ssh_channel = self._ssh.invoke_shell()
         ssh_channel.setblocking(0)

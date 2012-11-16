@@ -89,7 +89,8 @@ class L2API(L2APIAutoCache):
             "show_version":    { "ttl":      300,
                                  "clear_on": [] },
             "show_interfaces": { "ttl":      60,
-                                 "clear_on": ["interface_attach_vlan", "interface_detach_vlan",
+                                 "clear_on": ["change_interface_description",
+                                              "interface_attach_vlan", "interface_detach_vlan",
                                               "lag_attach_interface", "lag_detach_interface"] },
             "show_lldp":       { "ttl":      60,
                                  "clear_on": [] },
@@ -100,11 +101,13 @@ class L2API(L2APIAutoCache):
             "show_vlans":      { "ttl":      60,
                                  "clear_on": ["create_vlan", "destroy_vlan",
                                               "enable_vlan", "disable_vlan",
+                                              "change_vlan_description",
                                               "interface_attach_vlan", "interface_detach_vlan",
                                               "lag_attach_vlan", "lag_detach_vlan"] },
             "show_lags":       { "ttl":      60,
                                  "clear_on": ["create_lag", "destroy_lag",
                                               "enable_lag", "disable_lag",
+                                              "change_lag_description",
                                               "lag_attach_interface", "lag_attach_interface",
                                               "lag_attach_vlan", "lag_detach_vlan"] },
         }
@@ -113,6 +116,9 @@ class L2API(L2APIAutoCache):
                                         error_mark=self.error_mark, config_term_cmd=self.config_term_cmd)
 
     def dump_config(self):
+        raise NotImplementedError("Not implemented")
+
+    def save_config(self):
         raise NotImplementedError("Not implemented")
 
     def show_system(self):
@@ -158,6 +164,15 @@ class L2API(L2APIAutoCache):
         raise NotImplementedError("Not implemented")
 
     def disable_lag(self, lag_id=None):
+        raise NotImplementedError("Not implemented")
+
+    def change_interface_description(self, interface_id=None, interface_description=None):
+        raise NotImplementedError("Not implemented")
+
+    def change_vlan_description(self, vlan_id=None, vlan_description=None):
+        raise NotImplementedError("Not implemented")
+
+    def change_lag_description(self, lag_id=None, lag_description=None):
         raise NotImplementedError("Not implemented")
 
     def destroy_vlan(self, vlan_id=None):

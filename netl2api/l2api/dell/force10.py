@@ -70,6 +70,9 @@ class Force10(L2API):
     def dump_config(self):
         return self.transport.execute("show running")
 
+    def save_config(self):
+        return self.transport.execute("copy running-config startup-config")
+
     def show_system(self):
         sys_bootvar    = self._show_bootvar()
         sys_version    = self.show_version()
@@ -378,6 +381,30 @@ class Force10(L2API):
             (r"\(conf-if-po-\d+\)#", "end")]
         self.transport.execute("configure", interactions=interactions)
 
+    def change_interface_description(self, interface_id=None, interface_description=None):
+        interface_id = parse_interface_id(self.transport, interface_id)
+        interactions = [
+            (r"\(conf\)#",                   "interface %s" % interface_id),
+            (r"\(conf-if-[a-z]+-\d+/\d+\)#", "description %s" % interface_description),
+            (r"\(conf-if-[a-z]+-\d+/\d+\)#", "end")]
+        self.transport.execute("configure", interactions=interactions)
+
+    def change_vlan_description(self, vlan_id=None, vlan_description=None):
+        check_vlan_exists(self.transport, vlan_id)
+        interactions = [
+            (r"\(conf\)#",           "interface vlan %s" % vlan_id),
+            (r"\(conf-if-vl-\d+\)#", "description %s" % vlan_description),
+            (r"\(conf-if-vl-\d+\)#", "end")]
+        self.transport.execute("configure", interactions=interactions)
+
+    def change_lag_description(self, lag_id=None, lag_description=None):
+        check_lag_exists(self.transport, lag_id)
+        interactions = [
+            (r"\(conf\)#",           "interface port-channel %s" % lag_id),
+            (r"\(conf-if-po-\d+\)#", "description %s" % lag_description),
+            (r"\(conf-if-po-\d+\)#", "end")]
+        self.transport.execute("configure", interactions=interactions)
+
     def destroy_vlan(self, vlan_id=None):
         check_vlan_hasnt_members(self, vlan_id)
         interactions = [
@@ -417,7 +444,7 @@ class Force10(L2API):
             (r"\(conf\)#",                   "interface vlan %s" % vlan_id),
             (r"\(conf-if-vl-\d+\)#",         "no %s %s" % (vlan_tag, interface_id)),
             (r"\(conf-if-vl-\d+\)#",         "end")]
-            # The interface (below) could be member of another VLAN - keep 'switchport'
+            # The interface (below) could be a member of another VLAN - keep 'switchport'
             # (r"\(conf\)#",                   "interface %s" % interface_id),
             # (r"\(conf-if-[a-z]+-\d+/\d+\)#", "no switchport"),
             # (r"\(conf-if-[a-z]+-\d+/\d+\)#", "end")]

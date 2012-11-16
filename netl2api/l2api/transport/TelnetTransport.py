@@ -76,7 +76,7 @@ class Telnet(L2Transport):
     @staticmethod
     def _check_telnet_auth(cmd_res=None):
         if AUTH_ERROR_RE.search(cmd_res[2]):
-            raise AuthenticationException("Authentication failed (invalid username and/or passwd)")
+            raise SwitchAuthenticationException("Telnet Authentication failed (invalid username and/or passwd)")
 
     def _execute(self, connection=None, cmd=None, interactions=None):
         super(Telnet, self)._execute(connection=connection, cmd=cmd, interactions=interactions)

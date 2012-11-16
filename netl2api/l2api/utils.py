@@ -32,7 +32,7 @@ LF   = lambda l: "%s\n" % l if not l.endswith("\n") else l
 CRLF = lambda l: "%s\r\n" % l if not l.endswith("\r\n") else l
 
 
-RE_CISCOLIKE_IF_NAME_FMT = re.compile(r"(^[a-zA-Z\-\s]+)(\d+/)?([0-9\-,]+$)")
+RE_CISCOLIKE_IF_NAME_FMT = re.compile(r"^([a-zA-Z\-\s]+)(\d+/)?([0-9\-,]+)$")
 RE_CISCOLIKE_CFG_COMMENT = re.compile(r"^!")
 RE_CISCOLIKE_CFG_IF_NAME = re.compile(r"^interface\s(.+)$")
 RE_CISCOLIKE_CFG_IF_DESC = re.compile(r"^\sdescription\s(.+)$")

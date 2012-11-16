@@ -256,7 +256,7 @@ class SystemSSH(object):
                 if len(buff_lines) >= 2:
                     prev_line = buff_lines[-2].strip()
                 if AUTH_PASSWD_RE.search(buff.getvalue()):
-                    raise AuthenticationFailed("Authentication failed (invalid username and/or passwd)")
+                    raise SSHAuthenticationFailed("SSH Authentication failed (invalid username and/or passwd)")
                 staled = len(last_read_lens) == last_read_lens.maxlen and \
                                 reduce(lambda x,y: x+y, last_read_lens) == 0
                 if crlf_sent is False and staled is True:
@@ -272,11 +272,11 @@ class SystemSSH(object):
                         break
         except SSHTimeout:
             self.close()
-            raise AuthenticationFailed("Timeout on SSH authentication")
+            raise SSHAuthenticationFailed("Timeout on SSH authentication")
         except SSHProcessException, e:
             if hasattr(e, "exit_code") and getattr(e, "exit_code") == 255:
                     #\ and AUTH_ERROR_RE.search(buff.getvalue()):
-                raise AuthenticationFailed("Authentication failed (invalid username and/or passwd)")
+                raise SSHAuthenticationFailed("SSH Authentication failed (invalid username and/or passwd)")
             raise e
 
     def recv(self, recv_bytes=4096):
@@ -361,5 +361,5 @@ class SSHNotReady(SystemSSHException):
 class SSHTimeout(SystemSSHException):
     pass
 
-class AuthenticationFailed(SystemSSHException):
+class SSHAuthenticationFailed(SystemSSHException):
     pass

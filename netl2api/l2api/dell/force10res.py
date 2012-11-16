@@ -70,15 +70,15 @@ RE_SH_SYSTEM_STACK_UNIT_fan = re.compile(r"\s+(\d+)\s+(\d+)\s+([a-zA-Z]+)\s+([a-
 
 # show arp
 RE_SH_ARP = re.compile(r"""
-                      ((?:\d{1,3}\.){3}\d{1,3})\s+(?:\d+|-)\
-                      ((?:[a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2})\
+                      ((?:\d{1,3}\.){3}\d{1,3})\s+(?:\d+|-)\s+
+                      ((?:[a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2})\s+
                       ([a-zA-Z]+\s*\d+(?:/\d+)?)""", re.VERBOSE)
 
 
 # show interfaces status
 RE_SH_INTERFACE_STATUS = re.compile(r"""
                                    ^(?P<interface_id>[a-zA-Z]+\s*\d+/\d+).+
-                                    (?P<status>Up|Down)\s+(?P<speed>Auto|\d+\s*Mbit)\
+                                    (?P<status>Up|Down)\s+(?P<speed>Auto|\d+\s*Mbit)\s+
                                     (?P<duplex>Auto|Half|Full)""", re.VERBOSE)
 
 
