@@ -5,6 +5,7 @@ NetL2API
 NetL2API (a.k.a L2API) intend to be an unique and generic API (Python/REST) for most common network/L2 operations (ports, VLANs and port-channels).
 
 It's splitted in two main modules called  'l2api' ('netl2api.l2api') and 'server' ('netl2api.server').
+
 The 'l2api' module is responsible for implement a generic Python interface for the various switch vendors (eg.: netl2api.l2api.dell.Force10).
 It's methods and signatures is defined by netl2api.l2api.L2API, which every vendor-class (device plugin) should extend.
 The 'server' module is just a HTTP wrapper for 'l2api' and defines a REST API.
