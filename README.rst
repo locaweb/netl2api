@@ -24,5 +24,5 @@ Packaging:
 ==========
 - Debian:
   NetL2API has a debian directory ready to be built. So, under Debian-based system, just run:
-  >>> apt-get -y install build-essential devscripts cdbs fakeroot dh-make python-dev python-setuptools
-  >>> dpkg-buildpackage -us -uc
+>>> apt-get -y install build-essential devscripts cdbs fakeroot dh-make python-dev python-setuptools
+>>> dpkg-buildpackage -us -uc
