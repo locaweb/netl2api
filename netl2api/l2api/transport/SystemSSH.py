@@ -63,7 +63,7 @@ class SystemSSH(object):
         self.shell_prompt         = None
         self._ssh_cmd = shlex.split("""ssh -t '-o ConnectTimeout=%s' '-o Protocol=2,1'
             '-o StrictHostKeyChecking=no' '-o PreferredAuthentications=password,keyboard-interactive'
-            '-o NumberOfPasswordPrompts=1' '-o TCPKeepAlive=yes' '-o ServerAliveInterval=60'
+            '-o NumberOfPasswordPrompts=1'
             '-o ControlMaster=no' '-o LogLevel=INFO' '-p %s' %s@%s""" % (self._ssh_connect_timeout,
                 self.port, self.username, self.host))
 
@@ -323,7 +323,7 @@ class SystemSSH(object):
     def _reset(self):
         self._ssh_child_pid     = None
         self._ssh_master_pty_fd = None
-        self.shell_prompt        = None
+        self.shell_prompt       = None
 
     def close(self):
         try:
@@ -339,6 +339,9 @@ class SystemSSH(object):
                 pass
             finally:
                 self._reset()
+
+    def __del__(self):
+        self.close()
 
 
 class SystemSSHException(Exception):

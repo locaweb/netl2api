@@ -239,5 +239,5 @@ class L2Transport(object):
                 pass
             self._connection = None
 
-    def __del__(self):
-        self.close()
+    # def __del__(self):
+    #     self.close()

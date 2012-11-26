@@ -413,10 +413,16 @@ class Flex10(L2API):
     # def create_lag(self, lag_id=None, lag_description=None):
     #     raise NotImplementedError("Not implemented")
 
+    # def enable_interface(self, interface_id=None):
+    #     raise NotImplementedError("Not implemented")
+
     # def enable_vlan(self, vlan_id=None):
     #     raise NotImplementedError("Not implemented")
 
     # def enable_lag(self, lag_id=None):
+    #     raise NotImplementedError("Not implemented")
+
+    # def disable_interface(self, interface_id=None):
     #     raise NotImplementedError("Not implemented")
 
     # def disable_vlan(self, vlan_id=None):

@@ -71,7 +71,10 @@ class Force10(L2API):
         return self.transport.execute("show running")
 
     def save_config(self):
-        return self.transport.execute("copy running-config startup-config")
+        #return self.transport.execute("copy running-config startup-config")
+        print "copy running-config startup-config"
+        #return self.transport.execute("show running")
+        #pass
 
     def show_system(self):
         sys_bootvar    = self._show_bootvar()
@@ -349,6 +352,14 @@ class Force10(L2API):
         interactions.append((r"\(conf-if-po-\d+\)#", "end"))
         self.transport.execute("configure", interactions=interactions)
 
+    def enable_interface(self, interface_id=None):
+        interface_id = parse_interface_id(self.transport, interface_id)
+        interactions = [
+            (r"\(conf\)#",                   "interface %s" % interface_id),
+            (r"\(conf-if-[a-z]+-\d+/\d+\)#", "no shutdown"),
+            (r"\(conf-if-[a-z]+-\d+/\d+\)#", "end")]
+        self.transport.execute("configure", interactions=interactions)
+
     def enable_vlan(self, vlan_id=None):
         check_vlan_exists(self.transport, vlan_id)
         interactions = [
@@ -363,6 +374,14 @@ class Force10(L2API):
             (r"\(conf\)#",           "interface port-channel %s" % lag_id),
             (r"\(conf-if-po-\d+\)#", "no shutdown"),
             (r"\(conf-if-po-\d+\)#", "end")]
+        self.transport.execute("configure", interactions=interactions)
+
+    def disable_interface(self, interface_id=None):
+        interface_id = parse_interface_id(self.transport, interface_id)
+        interactions = [
+            (r"\(conf\)#",                   "interface %s" % interface_id),
+            (r"\(conf-if-[a-z]+-\d+/\d+\)#", "shutdown"),
+            (r"\(conf-if-[a-z]+-\d+/\d+\)#", "end")]
         self.transport.execute("configure", interactions=interactions)
 
     def disable_vlan(self, vlan_id=None):

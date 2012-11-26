@@ -89,7 +89,8 @@ class L2API(L2APIAutoCache):
             "show_version":    { "ttl":      300,
                                  "clear_on": [] },
             "show_interfaces": { "ttl":      60,
-                                 "clear_on": ["change_interface_description",
+                                 "clear_on": ["enable_interface", "disable_interface",
+                                              "change_interface_description",
                                               "interface_attach_vlan", "interface_detach_vlan",
                                               "lag_attach_interface", "lag_detach_interface"] },
             "show_lldp":       { "ttl":      60,
@@ -112,6 +113,10 @@ class L2API(L2APIAutoCache):
                                               "lag_attach_vlan", "lag_detach_vlan"] },
         }
 
+
+        #self.transport = TransportManager.TransportPool(transport=transport, max_connections=2, host=host, port=port,
+        #                                                username=username, passwd=passwd, prompt_mark=self.prompt_mark,
+        #                                                error_mark=self.error_mark, config_term_cmd=self.config_term_cmd)
         self.transport = transport(host=host, port=port, username=username, passwd=passwd, prompt_mark=self.prompt_mark,
                                         error_mark=self.error_mark, config_term_cmd=self.config_term_cmd)
 
@@ -154,10 +159,16 @@ class L2API(L2APIAutoCache):
     def create_lag(self, lag_id=None, lag_description=None):
         raise NotImplementedError("Not implemented")
 
+    def enable_interface(self, interface_id=None):
+        raise NotImplementedError("Not implemented")
+
     def enable_vlan(self, vlan_id=None):
         raise NotImplementedError("Not implemented")
 
     def enable_lag(self, lag_id=None):
+        raise NotImplementedError("Not implemented")
+
+    def disable_interface(self, interface_id=None):
         raise NotImplementedError("Not implemented")
 
     def disable_vlan(self, vlan_id=None):
@@ -198,3 +209,10 @@ class L2API(L2APIAutoCache):
 
     def lag_detach_interface(self, lag_id=None, interface_id=None):
         raise NotImplementedError("Not implemented")
+
+    # def __del__(self):
+    #     if self.transport is not None:
+    #         try:
+    #             self.transport.close()
+    #         except Exception:
+    #             pass

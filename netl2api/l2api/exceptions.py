@@ -23,8 +23,8 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 
 
 __all__ = ["L2Exception", "InvalidParameter", "TransportTimeout", "TransportSocketTimeout",
-           "TransportTransactionException", "SwitchAuthenticationException", "SwitchInvalidParameter",
-           "SwitchCommandException"]
+           "TransportTransactionException", "NoTransportConnectionsAvailable",
+           "SwitchAuthenticationException", "SwitchInvalidParameter", "SwitchCommandException"]
 
 
 class L2Exception(Exception):
@@ -40,6 +40,9 @@ class TransportSocketTimeout(TransportTimeout):
     pass
 
 class TransportTransactionException(TransportTimeout):
+    pass
+
+class NoTransportConnectionsAvailable(L2Exception):
     pass
 
 class SwitchAuthenticationException(L2Exception):
