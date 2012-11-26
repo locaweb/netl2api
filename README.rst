@@ -18,7 +18,7 @@ Requirements:
 - python-apscheduler (as a scheduler for background tasks)
 - python-redis (as a cache and IPC for background tasks)
 
-To install these dependencies, just run:
+- To install these dependencies, just run:
 >>> pip install -e requirements.txt
 
 
