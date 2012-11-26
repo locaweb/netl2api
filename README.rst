@@ -42,3 +42,8 @@ Instalation:
 >>> python setup_netl2api_lib.py install
 >>> python setup_netl2api_l2api.py install
 >>> python setup_netl2api_l2api.py install
+
+
+Configuration:
+==============
+See comments on configuration files: *etc/netl2api/devices.cfg*, *etc/netl2api/netl2server.cfg*
