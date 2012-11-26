@@ -18,3 +18,4 @@ Requirements:
 - python-supay (as a daemon-manager)
 - python-apscheduler (as a scheduler for background tasks)
 - python-redis (as a cache and datastore for some background tasks)
+* see requirements.txt
