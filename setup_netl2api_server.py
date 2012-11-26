@@ -5,23 +5,20 @@ from setuptools import setup, find_packages
 
 
 data_files = [ ("/etc/netl2api",
-                    ["etc/netl2api/netl2server.cfg", "etc/netl2api/netl2server-roles.cfg",
-                     "etc/netl2api/devices.cfg", "etc/netl2api/netl2inventory.cfg"]
-                ) ]
+                    ["etc/netl2api/netl2server.cfg", "etc/netl2api/devices.cfg"]
+             ) ]
 
 setup(
     name               = "netl2api.server",
     namespace_packages = ["netl2api"],
     version            = "1.5.6",
-    packages           = ["netl2api", "netl2api.server", "netl2api.server.workers", "netl2api.inventory"],
+    packages           = ["netl2api", "netl2api.server", "netl2api.server.workers"],
     zip_safe           = False,
-    install_requires   = ["netl2api.lib", "netl2api.l2api", "simplejson", "bottle", "paste", "Supay", "apscheduler", "redis", "locautils"],
+    install_requires   = ["netl2api.lib", "netl2api.l2api", "simplejson", "bottle", "paste", "Supay", "apscheduler", "redis"],
 
     entry_points = {
         "console_scripts": [
             "netl2server     = netl2api.server.httpd:cli",
-            "netl2inventory  = netl2api.inventory.inventory:cli",
-            "netl2inventoryd = netl2api.inventory.inventoryd:cli",
         ]
     },
 
