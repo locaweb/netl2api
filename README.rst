@@ -10,6 +10,11 @@ The '**l2api**' module is responsible for implement a generic Python interface f
 The '**server**' module is just a HTTP wrapper for '**l2api**' and defines a REST API.
 
 
+Building Blocks:
+================
+.. image:: doc/netl2api-blocks.png
+
+
 Requirements:
 =============
 - python-bottle >= 0.11 (as a web framework)
