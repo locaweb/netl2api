@@ -5,12 +5,12 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name               = "netl2api.l2api",
+    name               = "netl2api.lib",
     namespace_packages = ["netl2api"],
     version            = "1.5.6",
-    packages           = ["netl2api", "netl2api.l2api", "netl2api.l2api.transport", "netl2api.l2api.dell", "netl2api.l2api.hp"],
-    zip_safe         = False,
-    install_requires = ["ssh", "pyOpenSSL"],
+    packages           = ["netl2api", "netl2api.lib"],
+    zip_safe           = False,
+    install_requires   = ["pyOpenSSL"],
 
     author       = "Eduardo S. Scarpellini",
     author_email = "eduardo.scarpellini@locaweb.com.br",

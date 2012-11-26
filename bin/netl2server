@@ -1,0 +1,7 @@
+#!/bin/sh
+
+root="$(dirname $0)/../"
+bin_python=$(which python)
+
+exec env NETL2API_CFG_BASE=${root}/etc/netl2api \
+         PYTHONPATH="${root}" ${bin_python} ${root}/netl2api/server/httpd.py $1
