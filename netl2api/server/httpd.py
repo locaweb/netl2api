@@ -167,6 +167,7 @@ def change_interface_description(device=None, interface_id=None):
     invalidate_cache("/interfaces/%s" % device)
 
 
+@reply_json
 def enable_interface(device=None, interface_id=None):
     logger.info("Enabling interface '%s' in device '%s' -- context: %s" %\
                     (interface_id, device, request["context"]))
@@ -176,6 +177,7 @@ def enable_interface(device=None, interface_id=None):
     invalidate_cache("/interfaces/%s" % device)
 
 
+@reply_json
 def disable_interface(device=None, interface_id=None):
     logger.info("Disabling interface '%s' in device '%s' -- context: %s" %\
                     (interface_id, device, request["context"]))
