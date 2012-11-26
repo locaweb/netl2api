@@ -17,5 +17,12 @@ Requirements:
 - python-paste (as a web server)
 - python-supay (as a daemon-manager)
 - python-apscheduler (as a scheduler for background tasks)
-- python-redis (as a cache and datastore for some background tasks)
-* see requirements.txt
+- python-redis (as a cache and IPC (locks/queues/pipes for background tasks))
+
+
+Packaging:
+==========
+- Debian:
+  NetL2API has a debian directory ready to be built. So, under Debian-based system, just run:
+  >>> apt-get -y install build-essential devscripts cdbs fakeroot dh-make python-dev python-setuptools
+  >>> dpkg-buildpackage -us -uc
