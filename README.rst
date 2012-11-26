@@ -12,7 +12,7 @@ The '**server**' module is just a HTTP wrapper for '**l2api**' and defines a RES
 
 Building Blocks:
 ================
-.. image:: netl2api/doc/netl2api-blocks.png
+.. image:: netl2api/blob/master/doc/netl2api-blocks.png
 
 
 Requirements:
