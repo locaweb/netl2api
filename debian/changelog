@@ -1,0 +1,110 @@
+netl2api (1.5.8ubuntu1) UNRELEASED; urgency=low
+
+  * fixing SSH connections-leak
+
+ -- Eduardo S. Scarpellini <escarpellini@x-navajo>  Thu, 22 Nov 2012 17:05:04 -0200
+
+netl2api (1.5.7) stable; urgency=low
+
+  * Locautils CAS
+  * CAS system
+  * Some improvements
+
+ -- root <root@ubuntu>  Tue, 13 Nov 2012 17:59:41 -0200
+
+netl2api (1.5.6) stable; urgency=low
+
+  * CPU-intensive commands fixed
+  * New-style L2-classes
+  * SysSSH transport
+  * Cache for show_*
+
+ -- Eduardo S. Scarpellini <escarpellini@x-navajo>  Tue, 23 Oct 2012 18:12:31 -0200
+
+netl2api (1.5.5) stable; urgency=low
+
+  * Minor improvements
+
+ -- Eduardo S. Scarpellini <escarpellini@x-navajo>  Mon, 17 Sep 2012 16:33:46 -0300
+
+netl2api (1.5.4) precise; urgency=low
+
+  * LLDP fixes
+  * Using planetexpress as a cache-backend for some calls
+
+ -- Eduardo S. Scarpellini <escarpellini@x-navajo>  Fri, 14 Sep 2012 12:20:51 -0300
+
+netl2api (1.5.3) precise; urgency=low
+
+  * Merging netl2ws and inventory pkgs.
+  * No discovery switch-plugin anymore
+
+ -- Eduardo S. Scarpellini <escarpellini@x-navajo>  Wed, 12 Sep 2012 18:25:54 -0300
+
+netl2api (1.5.0) precise; urgency=low
+
+  * Console refactored
+  * HP refactored
+  * More validations on HP/Flex10
+  * /tracepath to given or core switch
+
+ -- Eduardo S. Scarpellini <escarpellini@x-navajo>  Tue, 11 Sep 2012 18:06:33 -0300
+
+netl2api (1.0.12) precise; urgency=low
+
+  * Console refactored
+  * HP refactored
+  * More validations on HP/Flex10
+  * /tracepath to given or core switch
+
+ -- Eduardo S. Scarpellini <escarpellini@x-navajo>  Tue, 11 Sep 2012 18:04:34 -0300
+
+netl2api (1.0.11) precise; urgency=low
+
+  * Added Brocade
+  * Console refactored
+
+ -- root <root@ubuntu>  Wed, 22 Aug 2012 19:56:56 -0300
+
+netl2api (1.0.10) precise; urgency=low
+
+  * Configless
+
+ -- root <root@ubuntu>  Wed, 08 Aug 2012 14:44:04 -0300
+
+netl2api (1.0.9) precise; urgency=low
+
+  * Compat with old switches
+
+ -- root <root@ubuntu>  Mon, 06 Aug 2012 15:01:29 -0300
+
+netl2api (1.0.8) precise; urgency=low
+
+  * Trace Uplinks (Force10)
+
+ -- root <root@ubuntu>  Fri, 03 Aug 2012 08:15:06 -0300
+
+netl2api (1.0.7) oneiric; urgency=low
+
+  * Trace Uplinks (Flex10)
+  * Autocomplete
+
+ -- root <root@ubuntu>  Thu, 26 Jul 2012 23:17:49 -0300
+
+netl2api (1.0.6) oneiric; urgency=low
+
+  * 2nd deploy (bugfixes)
+
+ -- Eduardo S. Scarpellini <escarpellini@x-navajo>  Thu, 26 Jul 2012 20:22:41 -0300
+
+netl2api (1.0.1) quantal; urgency=low
+
+  * Update
+
+ -- root <root@ubuntu>  Wed, 18 Jul 2012 14:58:12 -0300
+
+netl2api (1.0.0) unstable; urgency=low
+
+  * Initial Release.
+
+ -- root <locaweb@locaweb.com.br>  Thu, 12 Jul 2012 20:23:45 -0300
