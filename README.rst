@@ -6,7 +6,7 @@ NetL2API
 
 It's splitted in two main modules called  '**l2api**' ('*netl2api.l2api*') and '**server**' ('*netl2api.server*').
 
-The '**l2api**' module is responsible for implement a generic Python interface for the various switch vendors (eg.: *netl2api.l2api.dell.Force10*). It's methods and signatures is defined by '*netl2api.l2api.L2API*'', which every vendor-class (device plugin) should extend.
+The '**l2api**' module is responsible for implement a generic Python interface for the various switch vendors (eg.: *netl2api.l2api.dell.Force10*). It's methods and signatures is defined by '*netl2api.l2api.L2API*', which every vendor-class (device plugin) should extend.
 The '**server**' module is just a HTTP wrapper for '**l2api**' and defines a REST API.
 
 
@@ -16,7 +16,7 @@ Requirements:
 - python-paste (as a web server)
 - python-supay (as a daemon-manager)
 - python-apscheduler (as a scheduler for background tasks)
-- python-redis (as a cache and IPC (locks/queues/pipes for background tasks))
+- python-redis (as a cache and IPC for background tasks)
 
 To install these dependencies, just run:
 >>> pip install -e requirements.txt
@@ -29,6 +29,9 @@ Packaging:
 >>> dpkg-buildpackage -us -uc
 
 
-Installing:
-===========
-
+Instalation:
+============
+If you have executed the step above (section **Packaging**), just install the generated packages:
+>>> dpkg -i netl2api-lib_1.5.8ubuntu1_amd64.deb
+>>> dpkg -i netl2api-l2api_1.5.8ubuntu1_amd64.deb
+>>> dpkg -i netl2api-server_1.5.8ubuntu1_amd64.deb
