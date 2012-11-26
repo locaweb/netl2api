@@ -26,7 +26,6 @@ import re
 import os
 import sys
 import pwd
-#import netl2api.lib.servicenow
 from multiprocessing import Process
 from netl2api.server.http_cache import cached, invalidate_cache
 from netl2api.server.http_utils import reply_json, validate_input, context
