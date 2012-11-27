@@ -39,7 +39,8 @@ Instalation:
 ============
 Install the dependencies (see **Requirements**)
 
-If you have executed the step above (section **Packaging**), **just install the generated packages**::
+If you have executed the step above (section **Packaging**), **just install the generated packages**
+::
     dpkg -i netl2api-lib_1.5.8ubuntu1_amd64.deb
     dpkg -i netl2api-l2api_1.5.8ubuntu1_amd64.deb
     dpkg -i netl2api-server_1.5.8ubuntu1_amd64.deb
