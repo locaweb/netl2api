@@ -24,28 +24,31 @@ Requirements:
 - python-redis (as a cache and IPC for background tasks)
 
 
-- **To install these dependencies, just run**:
->>> pip install -e requirements.txt
+**To install these dependencies, just run**:
+::
+    pip install -e requirements.txt
 
 
 Packaging:
 ==========
-- **Debian**: NetL2API has a debian directory ready to be built. So, **under Debian-based system, just run**:
->>> apt-get -y install build-essential devscripts cdbs fakeroot dh-make python-dev python-setuptools
->>> dpkg-buildpackage -us -uc
+**Debian**: NetL2API has a debian directory ready to be built. So, **under Debian-based system, just run**:
+::
+    apt-get -y install build-essential devscripts cdbs fakeroot dh-make python-dev python-setuptools
+    dpkg-buildpackage -us -uc
 
 
 Instalation:
 ============
 Install the dependencies (see **Requirements**)
 
-If you have executed the step above (section **Packaging**), **just install the generated packages**
+If you have executed the step above (section **Packaging**), **just install the generated packages**:
 ::
     dpkg -i netl2api-lib_1.5.8ubuntu1_amd64.deb
     dpkg -i netl2api-l2api_1.5.8ubuntu1_amd64.deb
     dpkg -i netl2api-server_1.5.8ubuntu1_amd64.deb
 
-If not, **you can install each python-egg manually**::
+If not, **you can install each python-egg manually**:
+::
     python setup_netl2api_lib.py install
     python setup_netl2api_l2api.py install
     python setup_netl2api_l2api.py install
