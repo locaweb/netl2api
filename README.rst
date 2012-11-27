@@ -1,4 +1,3 @@
-========
 NetL2API
 ========
 
@@ -11,12 +10,12 @@ The '**server**' module is just a HTTP wrapper for '**l2api**' and defines a RES
 
 
 Building Blocks:
-================
+----------------
 .. image:: https://raw.github.com/locaweb/netl2api/master/doc/netl2api-blocks.png
 
 
 Requirements:
-=============
+-------------
 - python-bottle >= 0.11 (as a web framework)
 - python-paste (as a web server)
 - python-supay (as a daemon-manager)
@@ -39,7 +38,7 @@ Packaging:
 
 Instalation:
 ============
-Install the dependencies (see ***Requirements***)
+Install the dependencies (see **Requirements**)
 
 If you have executed the step above (section **Packaging**), **just install the generated packages**:
 ::
