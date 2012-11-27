@@ -39,7 +39,7 @@ Packaging:
 
 Instalation:
 ============
-Install the dependencies (see **Requirements**)
+Install the dependencies (see ***Requirements***)
 
 If you have executed the step above (section **Packaging**), **just install the generated packages**:
 ::
