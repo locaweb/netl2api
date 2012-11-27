@@ -11,11 +11,13 @@ The '**server**' module is just a HTTP wrapper for '**l2api**' and defines a RES
 
 Building Blocks:
 ----------------
+
 .. image:: https://raw.github.com/locaweb/netl2api/master/doc/netl2api-blocks.png
 
 
 Requirements:
 -------------
+
 - python-bottle >= 0.11 (as a web framework)
 - python-paste (as a web server)
 - python-supay (as a daemon-manager)
@@ -29,7 +31,8 @@ Requirements:
 
 
 Packaging:
-==========
+----------
+
 **Debian**: NetL2API has a debian directory ready to be built. So, **under Debian-based system, just run**:
 ::
     # apt-get -y install build-essential devscripts cdbs fakeroot dh-make python-dev python-setuptools
@@ -37,7 +40,8 @@ Packaging:
 
 
 Instalation:
-============
+------------
+
 Install the dependencies (see **Requirements**)
 
 If you have executed the step above (section **Packaging**), **just install the generated packages**:
@@ -54,11 +58,13 @@ If not, **you can install each python-egg manually**:
 
 
 Configuration:
-==============
+--------------
+
 **See comments on configuration files**: *etc/netl2api/devices.cfg*, *etc/netl2api/netl2server.cfg*
 
 
-REST API Usage:
-===============
+REST API:
+---------
+
 **TODO**
 
