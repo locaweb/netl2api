@@ -232,3 +232,29 @@ Device System Information:
         },
         "system_version": "8.3.10.2"
     }
+
+Device Interfaces/Ports:
+~~~~~~~~~~~~~~~~~~~~~~~~
+- **HTTP Method**: GET
+- **HTTP URL Suffix**: /interfaces/<device-id>[/interface-id]
+- **HTTP Status Code**: 200
+- **HTTP Content-Type**: application/json; charset=UTF-8
+
+**Example**:
+::
+    # curl http://localhost:8080/interfaces/swdelltest0001/Te%200/9 | python -mjson.tool
+    {
+        "Te 0/9": {
+            "configured_duplex": "auto",
+            "configured_speed": "auto",
+            "description": null,
+            "duplex": "auto",
+            "enabled": false,
+            "interface_id": "Te 0/9",
+            "mac": null,
+            "mtu": 9252,
+            "speed": "auto",
+            "status": "down"
+        }
+    }
+
