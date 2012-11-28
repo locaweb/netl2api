@@ -71,6 +71,7 @@ Devices List:
 - **HTTP Method**: GET
 - **HTTP URL Suffix**: /devices
 - **HTTP Return Code**: 200
+- **HTTP Content-Type/BODY**: application/json; charset=UTF-8
 
 **Example**:
 ::
@@ -79,4 +80,36 @@ Devices List:
         "bladehptest0001",
         "swdelltest0001"
     ]
+
+Device Information:
+~~~~~~~~~~~~~~~~~~~
+- **HTTP Method**: GET
+- **HTTP URL Suffix**: /info/<devices>
+- **HTTP Return Code**: 200
+- **HTTP Content-Type/BODY**: application/json; charset=UTF-8
+
+**Example**:
+::
+    # curl http://localhost:8080/info/swdelltest0001 | python -mjson.tool
+    {
+        "hostname": "aswtlabita0001",
+        "l2api": {
+            "device.hwtype": "stackable_switch",
+            "device.mgmt-api": "netl2api.l2api.dell.force10.Force10",
+            "device.mgmt-host": "192.168.13.253",
+            "device.vendor": "DELL"
+        },
+        "version": {
+            "boot_flash_memory": "128M",
+            "build_path": "/sites/sjc/work/build/buildSpaces/build08/E8-3-10/SW/SRC/Cp_src/Tacacs",
+            "build_time": "Thu Mar 29 00:54:31 PDT 2012",
+            "control_processor": "Freescale QorIQ P2020",
+            "ftos_version": "8.3.10.2",
+            "memory_size": "2147483648",
+            "rtos_version": "1.0",
+            "sys_name": "Dell Force10 Real Time Operating System Software",
+            "system_image": "\"system://A\"",
+            "system_type": "S4810 "
+        }
+    }
 
