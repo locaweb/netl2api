@@ -258,9 +258,8 @@ Device Interface(s)/Port(s) List:
         }
     }
 
-
-Change Interface(s)/Port(s) Description:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Change Interface Description:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - **HTTP Method**: PUT
 - **HTTP URL Suffix**: /interfaces/<device-id>/<interface-id>/change_description
 - **HTTP Status Code**: 200
@@ -268,3 +267,43 @@ Change Interface(s)/Port(s) Description:
 **Example**:
 ::
     # curl -v -X PUT -d interface_description="new description" http://localhost:8080/interfaces/swdelltest0001/Te%200/9/change_description
+
+Enable/Disable Interface:
+~~~~~~~~~~~~~~~~~~~~~~~~~
+**TODO**
+
+Attach/Dettach a VLAN to/from an Interface:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**TODO**
+
+Create/Remove VLAN:
+~~~~~~~~~~~~~~~~~~~
+**TODO**
+
+Enable/Disable VLAN:
+~~~~~~~~~~~~~~~~~~~~
+**TODO**
+
+Change VLAN Description:
+~~~~~~~~~~~~~~~~~~~~~~~~
+**TODO**
+
+Create/Remove LAG (a.k.a. port-channel or bond):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**TODO**
+
+Enable/Disable LAG:
+~~~~~~~~~~~~~~~~~~~
+**TODO**
+
+Change LAG Description:
+~~~~~~~~~~~~~~~~~~~~~~~
+**TODO**
+
+Attach/Dettach an Interface to/from a LAG:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**TODO**
+
+Attach/Dettach a VLAN to/from a LAG:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**TODO**
