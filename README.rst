@@ -70,8 +70,8 @@ Devices List:
 ~~~~~~~~~~~~~
 - **HTTP Method**: GET
 - **HTTP URL Suffix**: /devices
-- **HTTP Return Code**: 200
-- **HTTP Content-Type/BODY**: application/json; charset=UTF-8
+- **HTTP Status Code**: 200
+- **HTTP Content-Type**: application/json; charset=UTF-8
 
 **Example**:
 ::
@@ -84,9 +84,9 @@ Devices List:
 Device Information:
 ~~~~~~~~~~~~~~~~~~~
 - **HTTP Method**: GET
-- **HTTP URL Suffix**: /info/<devices>
-- **HTTP Return Code**: 200
-- **HTTP Content-Type/BODY**: application/json; charset=UTF-8
+- **HTTP URL Suffix**: /info/<device-id>
+- **HTTP Status Code**: 200
+- **HTTP Content-Type**: application/json; charset=UTF-8
 
 **Example**:
 ::
@@ -111,5 +111,28 @@ Device Information:
             "system_image": "\"system://A\"",
             "system_type": "S4810 "
         }
+    }
+
+Device Version (a.k.a. *show version*):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- **HTTP Method**: GET
+- **HTTP URL Suffix**: /version/<device-id>
+- **HTTP Status Code**: 200
+- **HTTP Content-Type**: application/json; charset=UTF-8
+
+**Example**:
+::
+    # curl http://localhost:8080/version/swdelltest0001 | python -mjson.tool
+    {
+        "boot_flash_memory": "128M",
+        "build_path": "/sites/sjc/work/build/buildSpaces/build08/E8-3-10/SW/SRC/Cp_src/Tacacs",
+        "build_time": "Thu Mar 29 00:54:31 PDT 2012",
+        "control_processor": "Freescale QorIQ P2020",
+        "ftos_version": "8.3.10.2",
+        "memory_size": "2147483648",
+        "rtos_version": "1.0",
+        "sys_name": "Dell Force10 Real Time Operating System Software",
+        "system_image": "\"system://A\"",
+        "system_type": "S4810 "
     }
 
