@@ -66,5 +66,7 @@ Configuration:
 REST API:
 ---------
 
-**TODO**
-
+Devices List:
+~~~~~~~~~~~~~
+- **HTTP Method**: GET
+- **HTTP URL Suffix**: /devices
