@@ -74,22 +74,7 @@ Devices List:
 
 **Example**:
 ::
-    # curl -v -X GET http://localhost:8080/devices | python -mjson.tool
-    * Connected to localhost (127.0.0.1) port 8080 (#0)
-    > GET /devices HTTP/1.1
-    > User-Agent: curl/7.27.0
-    > Host: localhost:8080
-    > Accept: */*
-    >
-    * additional stuff not fine transfer.c:1037: 0 0
-    * HTTP 1.0, assume close after body
-    < HTTP/1.0 200 OK
-    < Server: PasteWSGIServer/0.5 Python/2.7.3
-    < Date: Wed, 28 Nov 2012 20:18:33 GMT
-    < Content-Length: 37
-    < Content-Type: application/json; charset=UTF-8
-    <
-    * Closing connection #0
+    # curl http://localhost:8080/devices | python -mjson.tool
     [
         "bladehptest0001",
         "swdelltest0001"
