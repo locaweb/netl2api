@@ -233,8 +233,8 @@ Device System Information:
         "system_version": "8.3.10.2"
     }
 
-Device Interfaces/Ports:
-~~~~~~~~~~~~~~~~~~~~~~~~
+Device Interface(s)/Port(s) List:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - **HTTP Method**: GET
 - **HTTP URL Suffix**: /interfaces/<device-id>[/interface-id]
 - **HTTP Status Code**: 200
@@ -258,3 +258,13 @@ Device Interfaces/Ports:
         }
     }
 
+
+Change Interface(s)/Port(s) Description:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- **HTTP Method**: PUT
+- **HTTP URL Suffix**: /interfaces/<device-id>/<interface-id>/change_description
+- **HTTP Status Code**: 200
+
+**Example**:
+::
+    # curl -v -X PUT -d interface_description="new description" http://localhost:8080/interfaces/swdelltest0001/Te%200/9/change_description
