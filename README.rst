@@ -27,7 +27,7 @@ Requirements:
 
 **To install these dependencies, just run**:
 ::
-    # pip install -e requirements.txt
+    # pip install -r requirements.txt
 
 
 Packaging:
