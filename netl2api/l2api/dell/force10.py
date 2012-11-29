@@ -71,7 +71,8 @@ class Force10(L2API):
         return self.transport.execute("show running")
 
     def save_config(self):
-        self.transport.execute("copy running-config startup-config")
+        self.transport.execute("copy running-config startup-config", 
+                               interactions=[("Proceed to copy the file.*", "yes")])
 
     def show_system(self):
         sys_bootvar    = self._show_bootvar()
