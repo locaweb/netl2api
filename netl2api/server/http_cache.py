@@ -56,8 +56,10 @@ def cached(ttl=600):
                 logger.exception("Error in redis_cli connection (cache database)")
                 return f(*args, **kwargs)
             cache_key     = "%s:%s" % (request.environ.get("REQUEST_METHOD"), request.environ.get("PATH_INFO"))
-            cache_subkey  = ";".join(["%s=%s" % (k,v) for k,v in request.query.iteritems()])
-            cache_subkey += ";".join(["%s=%s" % (k,v) for k,v in request.forms.iteritems()])
+            cache_subkey  = ";".join(["%s=%s" % (k,v) for k,v in request.query.iteritems() \
+                                        if k != "ticket"])
+            cache_subkey += ";".join(["%s=%s" % (k,v) for k,v in request.forms.iteritems() \
+                                        if k != "ticket"])
             cache_rkey    = "cache:%s:%s" % (cache_key, sha1(cache_subkey).hexdigest())
             cached_r      = cache_db.get(cache_rkey)
             if cached_r is not None:
