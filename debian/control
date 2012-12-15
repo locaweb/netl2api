@@ -10,20 +10,27 @@ XS-Python-Version: >= 2.6
 Package: netl2api-lib
 Architecture: any
 XS-Python-Version: >= 2.6
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-openssl
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-openssl, python-redis
 Description: Python generic API (vendor agnostic) for network/L2 operations
  Python generic API (vendor agnostic) for network/L2 operations
 
 Package: netl2api-l2api
 XS-Python-Version: >= 2.6
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-ssh, python-openssl
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-openssl
 Description: Python generic API (vendor agnostic) for network/L2 operations
  Python generic API (vendor agnostic) for network/L2 operations
 
 Package: netl2api-server
 XS-Python-Version: >= 2.6
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-simplejson, python-bottle, python-paste, python-supay, python-apscheduler, python-redis, python-locautils, netl2api-lib, netl2api-l2api
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-simplejson, python-bottle, python-paste, python-supay, python-apscheduler, netl2api-lib, netl2api-l2api, python-ipaddr
 Description: HTTP/REST generic API (vendor agnostic) for network/L2 operations
  HTTP/REST generic API (vendor agnostic) for network/L2 operations
+
+Package: netl2api-console
+XS-Python-Version: >= 2.6
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-openssl, netl2api-lib, ipython (>= 0.13.1)
+Description: console/CLI for network/L2 HTTP/REST generic API (netl2server)
+ console/CLI for network/L2 HTTP/REST generic API (netl2server)

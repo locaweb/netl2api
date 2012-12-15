@@ -11,10 +11,10 @@ data_files = [ ("/etc/netl2api",
 setup(
     name               = "netl2api.server",
     namespace_packages = ["netl2api"],
-    version            = "1.5.6",
-    packages           = ["netl2api", "netl2api.server", "netl2api.server.workers"],
+    version            = "1.5.15",
+    packages           = ["netl2api", "netl2api.server", "netl2api.server.workers", "netl2api.inventory"],
     zip_safe           = False,
-    install_requires   = ["netl2api.lib", "netl2api.l2api", "simplejson", "bottle", "paste", "Supay", "apscheduler", "redis"],
+    install_requires   = ["netl2api.lib", "netl2api.l2api", "simplejson", "bottle", "paste", "Supay", "apscheduler"],
 
     entry_points = {
         "console_scripts": [
