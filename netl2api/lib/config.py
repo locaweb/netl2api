@@ -25,12 +25,13 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 import os
 import sys
 import stat
+import redis
 import logging
 import ConfigParser
 from logging.handlers import SysLogHandler
 
 
-__all__ = ["get_netl2server_cfg", "get_devices_cfg", "setup_netl2server_logger",  "setup_persistence_ctrl_logger"]
+__all__ = ["get_netl2server_cfg", "get_devices_cfg", "setup_netl2server_logger", "setup_persistence_ctrl_logger"]
 
 
 ENVVAR_CFGBASE  = "NETL2API_CFG_BASE"
@@ -74,8 +75,38 @@ def get_netl2server_cfg():
     return get_cfg("netl2server", check_permission=None)
 
 
+def get_redis_devices_cfg():
+    cfg       = get_cfg("redis-devices", check_permission=600)
+    dev_l2api = {}
+    for k in cfg.sections():
+        dev_l2api[k.strip()] = dict([(x,y) for x,y in section(cfg, k).items()])
+    return dev_l2api
+
+
+class RedisClient(object):
+    # TODO: move-me to a more appropriate library file
+    def __init__(self, db=7, timeout=3):
+        cfg       = get_netl2server_cfg()
+        self.host = cfg.get("redis", "host")
+        self.port = cfg.getint("redis", "port")
+        self.timeout = timeout
+        self.db      = db
+        self._redis  = redis.Redis(host=self.host, port=self.port, db=self.db,
+                                   socket_timeout=self.timeout)
+
+    def get_connection(self):
+        if self._redis is None or not self._redis.ping():
+            self._redis = redis.Redis(host=self.host, port=self.port, db=self.db,
+                                      socket_timeout=self.timeout)
+        return self._redis
+
+
 def get_devices_cfg():
-    return get_cfg("devices", check_permission=600)
+    devices_cfg = get_cfg("devices", check_permission=600)
+    for k in devices_cfg.sections():
+        if k.startswith("device."):
+            switches[k[7:]] = dict([(x,y) for x,y in section(devices_cfg, k).items()])
+    return switches
 
 
 syslog_sockets = {

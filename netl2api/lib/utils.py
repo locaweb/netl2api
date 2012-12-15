@@ -23,26 +23,26 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 
 
 import re
-import config
+import threading
+from uuid import uuid4
 from collections import deque
+from netl2api.lib import config
 
 
-__all__ = ["cfg", "switches", "list_switches", "get_sw_handler_class", "get_switch_instance",
-           "graph_repr", "find_network_paths"]
+__all__ = ["gen_context_uid", "get_context_uid", "get_sw_handler_class", "get_switch_instance"]
 
 
-cfg = config.get_devices_cfg()
+_thr_local = threading.local()
+def gen_context_uid():
+    _thr_local.l2api_ctx_uid = str(uuid4())
+    return _thr_local.l2api_ctx_uid
 
 
-def list_switches():
-    switches = {}
-    for k in cfg.sections():
-        if k.startswith("device.") and not "default" in k:
-            switches[k[7:]] = dict([(x,y) for x,y in config.section(cfg, k).items()])
-    return switches
-
-
-switches = list_switches()
+def get_context_uid():
+    try:
+        return _thr_local.l2api_ctx_uid
+    except AttributeError:
+        return
 
 
 def get_sw_handler_class(sw_classname=None):
@@ -52,9 +52,19 @@ def get_sw_handler_class(sw_classname=None):
 
 
 def get_switch_instance(device):
-    try:
-        swapi = get_sw_handler_class(switches[device]["mgmt-api"])
-    except KeyError:
-        raise Exception("Switch not known/configured => '%s'" % device)
+    switches = config.get_devices_cfg()
+    if not switches.has_key(device):
+        raise DeviceNotFound("Switch not known/configured => '%s'" % device)
+    if not switches[device].get("mgmt-api") or not switches[device].get("mgmt-user") \
+            or not switches[device].get("mgmt-pass"):
+        raise MisconfiguredDevice("The device '%s' are misconfigured - see the devices.cfg or redis-devices.cfg" % device)
+    swapi = get_sw_handler_class(switches[device]["mgmt-api"])
     return swapi(host=switches[device]["mgmt-host"], port=int(switches[device]["mgmt-port"]),
                  username=switches[device]["mgmt-user"], passwd=switches[device]["mgmt-pass"])
+
+class MisconfiguredDevice(Exception):
+    pass
+
+class DeviceNotFound(Exception):
+    pass
+
