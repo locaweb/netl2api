@@ -75,14 +75,6 @@ def get_netl2server_cfg():
     return get_cfg("netl2server", check_permission=None)
 
 
-def get_redis_devices_cfg():
-    cfg       = get_cfg("redis-devices", check_permission=600)
-    dev_l2api = {}
-    for k in cfg.sections():
-        dev_l2api[k.strip()] = dict([(x,y) for x,y in section(cfg, k).items()])
-    return dev_l2api
-
-
 class RedisClient(object):
     # TODO: move-me to a more appropriate library file
     def __init__(self, db=7, timeout=3):
