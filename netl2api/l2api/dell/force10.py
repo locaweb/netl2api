@@ -23,12 +23,12 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 
 
 import re
-from force10res import *
-from force10utils import *
-from force10checks import *
-from force10exceptions import *
 from netl2api.l2api import L2API
 from netl2api.l2api.utils import *
+from netl2api.l2api.dell.force10res import *
+from netl2api.l2api.dell.force10utils import *
+from netl2api.l2api.dell.force10checks import *
+from netl2api.l2api.dell.force10exceptions import *
 
 
 __all__ = ["Force10"]

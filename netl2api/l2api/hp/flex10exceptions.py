@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 from netl2api.l2api.exceptions import L2Exception, SwitchInvalidParameter
 
 
-__all__ = ["Flex10InvalidParam", "Flex10Exception"]
+__all__ = ["Flex10InvalidParam", "Flex10Exception", "Flex10MasterDiscoveryException"]
 
 
 class Flex10Exception(L2Exception):

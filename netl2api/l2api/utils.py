@@ -32,18 +32,18 @@ LF   = lambda l: "%s\n" % l if not l.endswith("\n") else l
 CRLF = lambda l: "%s\r\n" % l if not l.endswith("\r\n") else l
 
 
-RE_CISCOLIKE_IF_NAME_FMT = re.compile(r"^([a-zA-Z\-\s]+)(\d+/)?([0-9\-,]+)$")
-RE_CISCOLIKE_CFG_COMMENT = re.compile(r"^!")
-RE_CISCOLIKE_CFG_IF_NAME = re.compile(r"^interface\s(.+)$")
-RE_CISCOLIKE_CFG_IF_DESC = re.compile(r"^\sdescription\s(.+)$")
-RE_CISCOLIKE_CFG_IP_ADDR = re.compile(r"^\sip\saddress\s(.+)?$")
-RE_CISCOLIKE_CFG_IF_MTU  = re.compile(r"^\smtu(\s.+)?$")
-RE_CISCOLIKE_CFG_IF_SPEED  = re.compile(r"^\sspeed\s(.+)$")
-RE_CISCOLIKE_CFG_IF_DUPLEX = re.compile(r"^\sduplex\s(.+)$")
+RE_CISCOLIKE_IF_NAME_FMT          = re.compile(r"^([a-zA-Z\-\s]+)(\d+/)?([0-9\-,]+)$")
+RE_CISCOLIKE_CFG_COMMENT          = re.compile(r"^!")
+RE_CISCOLIKE_CFG_IF_NAME          = re.compile(r"^(?:interface|vlan|lag)\s(.+)$")
+RE_CISCOLIKE_CFG_IF_DESC          = re.compile(r"^\sdescription\s(.+)$")
+RE_CISCOLIKE_CFG_IP_ADDR          = re.compile(r"^\sip\saddress\s(.+)?$")
+RE_CISCOLIKE_CFG_IF_MTU           = re.compile(r"^\smtu(\s.+)?$")
+RE_CISCOLIKE_CFG_IF_SPEED         = re.compile(r"^\sspeed\s(.+)$")
+RE_CISCOLIKE_CFG_IF_DUPLEX        = re.compile(r"^\sduplex\s(.+)$")
 RE_CISCOLIKE_CFG_IF_VLAN_TAGGED   = re.compile(r"^\s(?:tagged|switchport\strunk\sallowed\svlan)\s(.+)$")
 RE_CISCOLIKE_CFG_IF_VLAN_UNTAGGED = re.compile(r"^\s(?:untagged|switchport\s(?:access|trunk\snative)\svlan)\s(.+)$")
-RE_CISCOLIKE_CFG_IF_LAG       = re.compile(r"^\s(?:channel-group|\sport-channel)\s(.+)\smode")
-RE_CISCOLIKE_CFG_IF_ADM_STATE = re.compile(r"^\s((?:no\s)?shutdown)$")
+RE_CISCOLIKE_CFG_IF_LAG           = re.compile(r"^\s(?:channel-group|\sport-channel)\s(.+)\smode")
+RE_CISCOLIKE_CFG_IF_ADM_STATE     = re.compile(r"^\s((?:no\s)?shutdown|disable|enable)$")
 
 
 def cisco_like_runcfg_parser(rawruncfg=None):

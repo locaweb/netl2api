@@ -24,7 +24,6 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 
 from xml.dom.minidom import parseString
 from netl2api.l2api.hp.flex10exceptions import *
-from flex10exceptions import Flex10MasterDiscoveryException
 from urllib2 import Request, build_opener, HTTPError, HTTPRedirectHandler
 
 
@@ -49,10 +48,8 @@ def parse_interface_id(interface_id):
     return (enc_id, bay_id, port_id)
 
 
-def discover_master_switch(host=None, timeout=30):
-    soap_headers = {"Content-Type": "application/xml"}
-    soap_url     = "https://%s/vc" % host
-    soap_xml     = """
+DISCOVER_MASTER_SW_SOAP_HEADERS = {"Content-Type": "application/xml"}
+DISCOVER_MASTER_SW_SOAP_XML     = """
     <?xml version="1.0"?>
     <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope" xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:c14n="http://www.w3.org/2001/10/xml-exc-c14n#" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:AllocationStatusType="http://tempuri.org/AllocationStatusType.xsd" xmlns:OperationalStatusType="http://tempuri.org/OperationalStatusType.xsd" xmlns:AutomationStatusType="http://tempuri.org/AutomationStatusType.xsd" xmlns:hpvcm="http://hp.com/iss/net/vcm/resourceModel" xmlns:hpvcd="http://hp.com/iss/net/vcm/resourceDomain">
         <SOAP-ENV:Header>
@@ -68,14 +65,17 @@ def discover_master_switch(host=None, timeout=30):
     </SOAP-ENV:Envelope>
     """
 
+def discover_master_switch(host=None, timeout=60):
+    soap_url     = "https://%s/vc" % host
+
     try:
-        soap_req = Request(url=soap_url, data=soap_xml, headers=soap_headers)
+        soap_req = Request(url=soap_url, data=DISCOVER_MASTER_SW_SOAP_XML, headers=DISCOVER_MASTER_SW_SOAP_HEADERS)
         soap_req.get_method = lambda: "POST"
         soap_res = build_opener(NoRedirectHandler).open(soap_req, timeout=timeout)
         if soap_res.code == 200:
             xmldoc      = parseString(soap_res.read())
             switch_mode = xmldoc.getElementsByTagName("hpvcm:controlMode")[0].firstChild.nodeValue
-            if "MODE-STANDBY" in switch_mode.upper():
+            if "STANDBY" in switch_mode.upper():
                 return xmldoc.getElementsByTagName("hpvcm:masterHTTPLink")[0].firstChild.nodeValue
     except Exception, e:
         raise Flex10MasterDiscoveryException("Impossible to determine the Virtual Connect Manager for host '%s' (%s)" % (host, e))

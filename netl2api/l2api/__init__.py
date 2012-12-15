@@ -22,9 +22,9 @@
 __copyright__ = "Copyright 2012, Locaweb IDC"
 
 
-from autocache import L2APIAutoCache
 from netl2api.l2api.exceptions import *
-from netl2api.l2api.transport import SysSSHTransport
+from netl2api.l2api.autocache import L2APIAutoCache
+from netl2api.l2api.transport import SysSSHTransport #, TransportManager
 
 
 __all__ = ["L2API"]

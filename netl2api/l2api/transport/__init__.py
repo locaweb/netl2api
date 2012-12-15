@@ -28,6 +28,7 @@ import socket
 import logging
 from functools import wraps
 from netl2api.l2api.exceptions import *
+from netl2api.lib.utils import get_context_uid
 from errno import EPIPE, ECONNABORTED, ECONNRESET, ENETRESET
 
 
@@ -144,17 +145,19 @@ class L2Transport(object):
         self.port     = port
         self.username = username
         self.passwd   = passwd
-        self.prompt_mark    = prompt_mark
-        self.prompt_mark_re = re.compile(r"(?:\r)?\n(?:%s|%s)?%s\s*$" % \
-                (self.host, self.host.split(".")[0], self.prompt_mark), re.IGNORECASE)
+        self.prompt_mark = prompt_mark
+        # self.prompt_mark_re = re.compile(r"(?:\r)?\n(?:%s|%s|[a-z0-9]+(?:%s)?)?%s\s*$" % \
+        #         (self.host, self.host.split(".")[0], self.host.split(".")[0][-1:], self.prompt_mark), re.IGNORECASE)
+        self.prompt_mark_re  = re.compile(r"(?:\r)?\n(?:[a-z0-9\.\-\@_]+)?\s*%s\s*$" % self.prompt_mark, re.IGNORECASE)
         self.error_mark      = error_mark
+        self.error_mark_re   = re.compile(r"(%s.+)" % self.error_mark)
         self.config_term_cmd = config_term_cmd
         self.socket_timeout  = socket_timeout
         self.transaction_timeout        = transaction_timeout
         self.close_on_switch_error      = close_on_switch_error
         self.close_on_transaction_error = close_on_transaction_error
-        self._connection    = None
-        self._logger        = logging.getLogger(self.__class__.__name__)
+        self._connection = None
+        self._logger     = logging.getLogger(self.__class__.__name__)
         logging.basicConfig(format="%%(asctime)s [%%(levelname)s] %s[%%(process)d/%%(threadName)s]: %%(message)s" %\
                                  self.__class__.__name__)
         self._logger.setLevel(logging.DEBUG)
@@ -194,9 +197,11 @@ class L2Transport(object):
         """
         Execute command 'cmd' (and expect/execute 'interactions') through 'connection'
         """
-        self._logger.info("%s(%s@%s:%s): Command '%s' was invoked with interactions: %s" % \
+        context = {"CTX-UUID": get_context_uid()}
+        
+        self._logger.info("%s(%s@%s:%s): Command '%s' was invoked with interactions: %s -- context: %s" % \
         (self.__class__.__name__, self.username, self.host, self.port, cmd, \
-            "; ".join(["'%s'->'%s'" % (i_res, i_cmd) for i_res, i_cmd in interactions]) if interactions else "''"))
+            "; ".join(["'%s'->'%s'" % (i_res, i_cmd) for i_res, i_cmd in interactions]) if interactions else "''", context))
 
     @l2api_retry(times=3)
     def execute(self, cmd=None, interactions=None):

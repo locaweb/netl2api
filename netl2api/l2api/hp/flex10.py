@@ -23,10 +23,11 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 
 
 import re
-from flex10res import *
-from flex10utils import *
-from flex10checks import *
 from netl2api.l2api import L2API
+from netl2api.l2api.exceptions import *
+from netl2api.l2api.hp.flex10res import *
+from netl2api.l2api.hp.flex10utils import *
+from netl2api.l2api.hp.flex10checks import *
 from netl2api.l2api.hp.flex10exceptions import *
 
 
@@ -36,7 +37,7 @@ __all__ = ["Flex10"]
 class Flex10(L2API):
     def __init__(self, host=None, *args, **kwargs):
         self.__VENDOR__      = "HP"
-        self.__HWTYPE__      = "blade_server"
+        self.__HWTYPE__      = "blade_enclosure"
         self.prompt_mark     = "->"
         self.error_mark      = "ERROR: "
         super(Flex10, self).__init__(host=discover_master_switch(host), *args, **kwargs)
@@ -142,18 +143,34 @@ class Flex10(L2API):
                                                     "Server Name", "OS Name", "Asset Tag"],
                                        group_by=["server_id"])
 
+    # _show_servers() already provides this information
+    # def _show_vcprofile(self, vcprofile="*"):
+    #         return self._parse_flex10_list(raw_list=self.transport.execute("show profile %s" % vcprofile),
+    #                                        omit_fields=["Server", "Serial Number", "UUID", "NAG"],
+    #                                        group_by=["device_bay"])
+
     def _show_server_ports(self):
-        return self._parse_flex10_list(raw_list=self.transport.execute("show server-port *"),
-                                       omit_fields=["Port", "Network", "MAC Address", "Fabric",
-                                                    "Port WWN", "DCC Available", "DCC Version"],
-                                       fields_map={"server": "server_id",
-                                                   "id":     "interface_id"},
-                                       group_by=["interface_id"])
+        server_ports = self._parse_flex10_list(raw_list=self.transport.execute("show server-port *"),
+                                               omit_fields=["Port", "Network", "MAC Address", "Fabric",
+                                                            "Port WWN", "DCC Available", "DCC Version"],
+                                               fields_map={"server": "server_id",
+                                                           "id":     "interface_id"},
+                                               group_by=["interface_id"])
+
+        # HP Virtual Connect 3.30 doesn't seem to show the server profile in 'show server-port *'
+        if self.f10_version.startswith("3.30"):
+            #server_profiles = self._show_vcprofile()
+            servers = self._show_servers()
+            for server_attrs in server_ports.itervalues():
+                server_id = server_attrs["server_id"]
+                if not server_attrs.get("profile") and servers.get(server_id):
+                    server_attrs["profile"] = servers[server_id].get("server_profile")
+        return server_ports
 
     def _show_enet_connection(self, vcprofile="*"):
             return self._parse_flex10_list(raw_list=self.transport.execute("show enet-connection %s" % vcprofile),
-                                           group_by=["profile", "port"],
-                                           omit_fields=["PXE"])
+                                           omit_fields=["PXE"],
+                                           group_by=["profile", "port"])
 
     def _show_uplinkports(self):
         uplinkports = self._parse_flex10_list(raw_list=self.transport.execute("show uplinkport *"),
@@ -216,8 +233,12 @@ class Flex10(L2API):
                 if not interfaces_info.has_key(iface_id):
                     interfaces_info[iface_id] = {}
                 iomodule = int(port_mapping.split(":")[1][0])
-                flexnic  = [v for v in server_ports.itervalues() if v["profile"] == vport["profile"] \
-                                and int(v["i/o_module"]) == iomodule][0]
+                try:
+                    flexnic  = [v for v in server_ports.itervalues() if v["profile"] == vport["profile"] \
+                                    and int(v["i/o_module"]) == iomodule][0]
+                except IndexError:
+                    # workaround for 'HP Virtual Connect v3.30'
+                    flexnic = {}
                 interfaces_info[iface_id] = {
                     "interface_id": iface_id,
                     "server_id":    server_id,
@@ -233,14 +254,14 @@ class Flex10(L2API):
                     "status":            "up" if "ok" in vport["status"].lower() else vport["status"],
                     "enabled":           True,
                     "flexnic": {
-                         "flexnic_id":        flexnic["interface_id"],
-                         "status":            "up" if flexnic["status"].lower() == "linked" \
-                                                 else flexnic["status"],
-                         "configured_speed":  "auto" if flexnic["configured_speed"].lower() == "auto" \
-                                                 else flexnic["configured_speed"],
-                         "speed":             flexnic["speed"],
-                         "configured_duplex": flexnic["configured_duplex"].lower(),
-                         "duplex":            flexnic["duplex"].lower(),
+                         "flexnic_id":        flexnic.get("interface_id"),
+                         "status":            "up" if flexnic.get("status", "").lower() == "linked" \
+                                                 else flexnic.get("status"),
+                         "configured_speed":  "auto" if flexnic.get("configured_speed", "").lower() == "auto" \
+                                                 else flexnic.get("configured_speed"),
+                         "speed":             flexnic.get("speed"),
+                         "configured_duplex": flexnic.get("configured_duplex", "").lower(),
+                         "duplex":            flexnic.get("duplex", "").lower(),
                     }
                 }
         if interface_id is not None:
@@ -303,15 +324,21 @@ class Flex10(L2API):
         arp_info = {}
         for interconnect_mod in self._show_interconnect_mods().keys():
             interconnect_enc_id = interconnect_mod.split(":")[0]
-            for mac_ln in self.transport.execute("show interconnect-mac-table %s" % interconnect_mod).splitlines():
-                m = RE_SH_INTERCONN_MAC.search(mac_ln)
-                if m:
-                    intf_id = "%s:%s" % (interconnect_enc_id, m.group(1).strip())
-                    if interface_id is not None and interface_id != intf_id:
-                        continue
-                    if not arp_info.has_key(intf_id):
-                        arp_info[intf_id] = []
-                    arp_info[intf_id].append(m.group(2).strip())
+            try:
+                for mac_ln in self.transport.execute("show interconnect-mac-table %s" % interconnect_mod).splitlines():
+                    m = RE_SH_INTERCONN_MAC.search(mac_ln)
+                    if m:
+                        intf_id = "%s:%s" % (interconnect_enc_id, m.group(1).strip())
+                        if interface_id is not None and interface_id != intf_id:
+                            continue
+                        if not arp_info.has_key(intf_id):
+                            arp_info[intf_id] = []
+                        arp_info[intf_id].append(m.group(2).strip())
+            except SwitchCommandException, e:
+                if "operation failed" in str(e).lower():
+                    continue
+                else:
+                    raise
         return arp_info
 
     def show_uplinks(self):
@@ -353,10 +380,12 @@ class Flex10(L2API):
         enet_conns = self._show_enet_connection()
         vlans_info = {}
         for v in networks.itervalues():
+            if not v.has_key("vlan_id"):
+                continue
             vln_id = int(v["vlan_id"])
             if vlans_info.has_key(vln_id):
                 continue
-            vlan_networks  = filter(lambda x: int(x["vlan_id"]) == vln_id, networks.itervalues())
+            vlan_networks  = filter(lambda x: int(x.get("vlan_id", 0)) == vln_id, networks.itervalues())
             network_names  = []
             network_states = []
             vlans_info[vln_id] = { "vlan_id": vln_id,
@@ -370,10 +399,10 @@ class Flex10(L2API):
                 network_names.append(network_name)
                 network_states.append(network_state)
                 vlans_info[vln_id]["networks"][network_name] = {
-                                            "attached_lags": { network["shared_uplink_set"]: "tagged" },
-                                            "status":        network["status"].lower(),
-                                            "enabled":       network_state,
-                                            "attached_interfaces": {} }
+                                                        "attached_lags": { network["shared_uplink_set"]: "tagged" },
+                                                        "status":        network["status"].lower(),
+                                                        "enabled":       network_state,
+                                                        "attached_interfaces": {} }
                 vlans_info[vln_id]["attached_lags"][network["shared_uplink_set"]] = "tagged"
                 for network_profile in enet_conns.itervalues():
                     for vport in [v for v in network_profile.itervalues() if v["server"] and v["network_name"] == network_name]:
@@ -448,7 +477,7 @@ class Flex10(L2API):
 
     def destroy_vlan(self, vlan_id=None):
         check_vlan_hasnt_members(self, vlan_id)
-        return self._destroy_network(vlan_id=vlan_id)
+        return self._destroy_network(vlan_id=int(vlan_id))
 
     # def destroy_lag(self, lag_id=None):
     #     raise NotImplementedError("Not implemented")
@@ -495,7 +524,7 @@ class Flex10(L2API):
         unused_ports   = [k for k,v in enet_conns[vcprofile].iteritems() \
                             if v["port_mapping"].lower().startswith("lom") and not v["network_name"]]
         if len(unused_ports) < 2:
-            raise Flex10Exception("No enough free ports/FlexNICs => '%s:%s' (VCProfile='%s')" % (enc_id, bay_id, vcprofile))
+            raise Flex10Exception("No enough available virtual-ports => '%s:%s' (VCProfile='%s')" % (enc_id, bay_id, vcprofile))
         ioslot, ioport = enet_conns[vcprofile][str(unused_ports[0])]["port_mapping"].split(":")
         ioport         = ioport.split("-")[1]
         unused_ports_pair = [up for up in unused_ports \
@@ -524,7 +553,7 @@ class Flex10(L2API):
     def _network_detach_port(self, enc_id=None, bay_id=None, port_id=None, vlan_id=None):
         vcprofile = self._show_servers()["%s:%s" % (enc_id, bay_id)]["server_profile"]
         if vcprofile:
-            self.transport.execute("set enet-connection %s %s Network=\"\"" % (vcprofile, port))
+            self.transport.execute("set enet-connection %s %s Network=\"\"" % (vcprofile, port_id))
 
     def _find_vlan_ports(self, enc_id=None, bay_id=None, vlan_id=None):
         vlan_id   = int(vlan_id)
@@ -532,7 +561,7 @@ class Flex10(L2API):
         vlan_server_ports = [i.split(":")[2] for i in self.show_vlans(vlan_id)[vlan_id]["attached_interfaces"].iterkeys() \
                                  if i.startswith(server_id)]
         if len(vlan_server_ports) < 1:
-            raise Flex10Exception("No ports/FlexNICs from server '%s' in given VLAN => '%s'" % (server_id, vlan_id))
+            raise Flex10Exception("No ports/FlexNICs of server '%s' found in VLAN => '%s'" % (server_id, vlan_id))
         return vlan_server_ports
 
     def interface_detach_vlan(self, interface_id=None, vlan_id=None, tagged=False):

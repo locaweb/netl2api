@@ -26,6 +26,7 @@ import re
 import telnetlib
 from netl2api.l2api.utils import CRLF
 from netl2api.l2api.exceptions import *
+from netl2api.lib.utils import get_context_uid
 from netl2api.l2api.transport import L2Transport
 
 try:
@@ -80,6 +81,7 @@ class Telnet(L2Transport):
 
     def _execute(self, connection=None, cmd=None, interactions=None):
         super(Telnet, self)._execute(connection=connection, cmd=cmd, interactions=interactions)
+        context     = {"CTX-UUID": get_context_uid()}
         logger      = self._logger
         buff        = StringIO()
         connection.write(CRLF(cmd))
@@ -88,7 +90,7 @@ class Telnet(L2Transport):
                 i_res_re  = re.compile(i_res)
                 i_cmd_res = connection.expect([i_res_re], self.transaction_timeout)
                 if i_cmd_res[0] >= 0:
-                    logger.info("Pattern '%s' matched; Sending reply-command '%s'" % (i_res, i_cmd))
+                    logger.info("Pattern '%s' matched; Sending reply-command '%s' -- context: %s" % (i_res, i_cmd, context))
                     buff.write(i_cmd_res[2])
                     connection.write(CRLF(i_cmd))
         cmd_res = connection.expect([self.prompt_mark_re], self.transaction_timeout)
@@ -96,15 +98,19 @@ class Telnet(L2Transport):
         try:
             self._check_telnet_return(cmd_res)
         except TelnetProtocolException:
-            self._logger.debug("Incomplete data received: Stuck process or bad configured interactions. (transaction_timeout='%s'; recv_buffer='%s')" \
-                                     % (self.transaction_timeout, buff.getvalue()))
+            self._logger.debug("Incomplete data received: Stuck process or bad configured interactions -- context: %s. (transaction_timeout='%s'; recv_buffer='%s')" \
+                                     % (context, self.transaction_timeout, buff.getvalue()))
             buff.close()
             raise TransportTransactionException("Incomplete data received: Stuck process or bad configured interactions (transaction_timeout='%s')" % self.transaction_timeout)
         cmdout = "\r\n".join(buff.getvalue().splitlines()[1:-1])
         buff.close()
-        errpos = cmdout.find(self.error_mark)
-        if self.error_mark and errpos > -1:
-            raise SwitchCommandException(cmdout[errpos+len(self.error_mark):].strip())
+        if self.error_mark is not None:
+            # errpos = cmdout.find(self.error_mark)
+            # if self.error_mark and errpos > -1:
+            #     raise SwitchCommandException(cmdout[errpos+len(self.error_mark):].strip())
+            m = self.error_mark_re.search(cmdout)
+            if m:
+                raise SwitchCommandException(m.group(1).strip())
         return cmdout
 
 

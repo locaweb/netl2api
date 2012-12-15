@@ -22,8 +22,8 @@
 __copyright__ = "Copyright 2012, Locaweb IDC"
 
 
-from force10checks import *
-from force10exceptions import *
+from netl2api.l2api.dell.force10checks import *
+from netl2api.l2api.dell.force10exceptions import *
 
 
 __all__ = ["parse_interface_id", "get_interface_name", "get_short_ifname"]

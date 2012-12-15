@@ -43,7 +43,7 @@ except ImportError:
 __all__ = ["SystemSSH"]
 
 
-AUTH_PASSWD_RE = re.compile(r"password:[\s]*$", re.IGNORECASE)
+AUTH_PASSWD_RE = re.compile(r"(?:password|passcode):[\s]*$", re.IGNORECASE)
 #AUTH_ERROR_RE  = re.compile(r"(?:Permission denied|try again|Authentications that can continue)", re.IGNORECASE)
 
 
@@ -62,10 +62,9 @@ class SystemSSH(object):
         self._ssh_master_pty_fd   = None
         self.shell_prompt         = None
         self._ssh_cmd = shlex.split("""ssh -t '-o ConnectTimeout=%s' '-o Protocol=2,1'
-            '-o StrictHostKeyChecking=no' '-o PreferredAuthentications=password,keyboard-interactive'
-            '-o NumberOfPasswordPrompts=1'
-            '-o ControlMaster=no' '-o LogLevel=INFO' '-p %s' %s@%s""" % (self._ssh_connect_timeout,
-                self.port, self.username, self.host))
+                            '-o StrictHostKeyChecking=no' '-o PreferredAuthentications=password,keyboard-interactive'
+                            '-o NumberOfPasswordPrompts=1' '-o ControlMaster=no' '-o LogLevel=INFO' '-p %s' %s@%s""" \
+                            % (self._ssh_connect_timeout, self.port, self.username, self.host))
 
     @property
     def opened(self):
@@ -236,7 +235,8 @@ class SystemSSH(object):
 
     def _ssh_auth_wait_shell_prompt(self):
         buff           = StringIO()
-        last_read_lens = collections.deque(maxlen=10)
+        #last_read_lens = collections.deque(maxlen=10)
+        last_read_lens = collections.deque([], 10)
         crlf_sent      = False
         try:
             while True:
@@ -257,7 +257,7 @@ class SystemSSH(object):
                     prev_line = buff_lines[-2].strip()
                 if AUTH_PASSWD_RE.search(buff.getvalue()):
                     raise SSHAuthenticationFailed("SSH Authentication failed (invalid username and/or passwd)")
-                staled = len(last_read_lens) == last_read_lens.maxlen and \
+                staled = len(last_read_lens) == 10 and \
                                 reduce(lambda x,y: x+y, last_read_lens) == 0
                 if crlf_sent is False and staled is True:
                     self.send("\r\n")
@@ -330,15 +330,15 @@ class SystemSSH(object):
             self._check_child_state()
         except (SSHProcessException, SSHNotReady):
             pass
-        finally:
+        else:
             try:
                 os.kill(self._ssh_child_pid, signal.SIGTERM)
                 os.wait()
                 os.close(self._ssh_master_pty_fd)
             except OSError:
                 pass
-            finally:
-                self._reset()
+        finally:
+            self._reset()
 
     def __del__(self):
         self.close()

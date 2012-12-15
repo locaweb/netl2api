@@ -27,6 +27,7 @@ import ssh
 import time
 from netl2api.l2api.utils import LF
 from netl2api.l2api.exceptions import *
+from netl2api.lib.utils import get_context_uid
 from netl2api.l2api.transport import L2Transport
 
 try:
@@ -91,6 +92,7 @@ class PySSH(L2Transport):
 
     def _execute(self, connection=None, cmd=None, interactions=None):
         super(PySSH, self)._execute(connection=connection, cmd=cmd, interactions=interactions)
+        context     = {"CTX-UUID": get_context_uid()}
         logger      = self._logger
         buff        = StringIO()
         interaction = 0
@@ -100,21 +102,25 @@ class PySSH(L2Transport):
                 self._recvall_with_timeout(connection=connection, buff=buff)
             except SSHTimeout, e:
                 buff.close()
-                logger.error("Incomplete data received: Stuck process or bad configured interactions. (transaction_timeout='%s'; recv_buffer='%s')" \
-                                     % (e.recv_timeout, e.recv_buff))
+                logger.error("Incomplete data received: Stuck process or bad configured interactions -- context: %s. (transaction_timeout='%s'; recv_buffer='%s')" \
+                                     % (context, e.recv_timeout, e.recv_buff))
                 raise TransportTransactionException("Incomplete data received: Stuck process or bad configured interactions (transaction_timeout='%s')" % e.recv_timeout)
             if interactions and interaction <= (len(interactions) - 1):
                 i_res, i_cmd = interactions[interaction]
                 i_res_re     = re.compile(i_res)
                 if i_res_re.search(buff.getvalue()):
-                    logger.info("Pattern '%s' matched; Sending reply-command '%s'" % (i_res, i_cmd))
+                    logger.info("Pattern '%s' matched; Sending reply-command '%s' -- context: %s" % (i_res, i_cmd, context))
                     connection.send(LF(i_cmd))
                     interaction += 1
         cmdout = "\r\n".join(buff.getvalue().splitlines()[1:-1])
         buff.close()
-        errpos = cmdout.find(self.error_mark)
-        if self.error_mark is not None and errpos > -1:
-            raise SwitchCommandException(cmdout[errpos+len(self.error_mark):].strip())
+        if self.error_mark is not None:
+            # errpos = cmdout.find(self.error_mark)
+            # if self.error_mark is not None and errpos > -1:
+            #     raise SwitchCommandException(cmdout[errpos+len(self.error_mark):].strip())
+            m = self.error_mark_re.search(cmdout)
+            if m:
+                raise SwitchCommandException(m.group(1).strip())
         return cmdout
 
 
