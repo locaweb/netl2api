@@ -27,13 +27,13 @@ import os
 import sys
 import pwd
 from multiprocessing import Process
+from bottle import debug, run, route, get, put, delete, error, request, response, abort
 from netl2api.server.http_cache import cached, invalidate_cache
 from netl2api.server.http_utils import reply_json, validate_input, context
 from netl2api.server.workers import switch_cfg_persistence
 from netl2api.server.workers.switch_cfg_persistence_utils import defer_save_switch_cfg
-from netl2api.lib.utils import switches, get_switch_instance
-from netl2api.lib.config import get_netl2server_cfg, setup_netl2server_logger
-from bottle import debug, run, route, get, put, delete, error, request, response, abort
+from netl2api.lib.utils import get_switch_instance
+from netl2api.lib.config import get_netl2server_cfg, setup_netl2server_logger, get_devices_cfg
 
 
 cfg          = get_netl2server_cfg()
@@ -44,13 +44,15 @@ netl2debug   = cfg.get("logger", "level").lower() == "debug"
 RE_TYPE_VLAN_TAGGED = re.compile(r"^(?:True|False)$", re.IGNORECASE)
 
 
+# Force Exception if using devices.cfg and permissions are wrong
+dev_cfg = get_devices_cfg()
 @get("/devices")
 @context
 @reply_json
 def devices_list():
     # MUST return ONLY switch names -- for CLI completion purpose
     logger.info("Listing available devices -- context: %s" % request["context"])
-    return switches.keys()
+    return get_devices_cfg().keys()
 
 
 @get("/info/<device>")
@@ -99,7 +101,6 @@ RE_ROUTE_INTERFACE_ACTIONS = re.compile(r"^(.+)/((?:at|de)tach_vlan|change_descr
 @route(["/interfaces/<device>", "/interfaces/<device>/<remaining_path:path>"], ["get", "put"])
 @context
 def interfaces_route_actions(device=None, remaining_path=None):
-    print remaining_path
     if request.method.lower() == "get":
         return show_interfaces(device=device, interface_id=remaining_path)
     if request.method.lower() == "put":
@@ -402,7 +403,7 @@ def lag_detach_vlan(device=None, lag_id=None):
 # @get(["/networkpath/<from_device>", "/networkpath/<from_device>/<to_device>"])
 # @context
 # @reply_json
-# @cached(ttl=180)
+# @cached(ttl=120)
 # def trace_network_path(from_device=None, to_device=None):
 #     logger.info("Tracing network-path from device '%s' to '%s'  -- context: %s" %\
 #                      (from_device, to_device, request["context"]))
@@ -449,8 +450,12 @@ def error500(err):
 
 
 def start_workers():
-    p_switch_cfg_persistence = Process(target=switch_cfg_persistence.daemon)
-    p_switch_cfg_persistence.start()
+    if cfg.get("job.switch_cfg_persistence", "enabled") == "true":
+        p_switch_cfg_persistence = Process(target=switch_cfg_persistence.daemon)
+        p_switch_cfg_persistence.start()
+        #p_switch_cfg_persistence.join(1)
+    else:
+        logger.info("Persistence-control job is disabled")
 
 
 def start():
