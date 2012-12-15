@@ -25,6 +25,7 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 from functools import wraps
 from re import _pattern_type
 from bottle import request, response, abort
+from netl2api.lib.utils import gen_context_uid
 from netl2api.lib.config import get_netl2server_cfg, setup_netl2server_logger
 
 try:
@@ -55,7 +56,8 @@ def context(f):
     @wraps(f)
     def inject_ctx(*args, **kwargs):
         truncate = lambda i: i if len(i) <= 25 else "%s..." % i[:25]
-        context  = { "HTTP.ENV.REQUEST_METHOD": request.environ.get("REQUEST_METHOD"),
+        context  = { "CTX-UUID":                gen_context_uid(),
+                     "HTTP.ENV.REQUEST_METHOD": request.environ.get("REQUEST_METHOD"),
                      "HTTP.ENV.REMOTE_ADDR":    request.environ.get("REMOTE_ADDR"),
                      "HTTP.ENV.PATH_INFO":      request.environ.get("PATH_INFO") }
         if request.headers.get("X-Real-IP"):
