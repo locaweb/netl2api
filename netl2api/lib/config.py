@@ -102,6 +102,7 @@ class RedisClient(object):
 
 
 def get_devices_cfg():
+    switches    = {}
     devices_cfg = get_cfg("devices", check_permission=600)
     for k in devices_cfg.sections():
         if k.startswith("device."):
