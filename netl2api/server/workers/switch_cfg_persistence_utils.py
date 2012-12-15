@@ -22,25 +22,24 @@
 __copyright__ = "Copyright 2012, Locaweb IDC"
 
 
-from netl2api.server.utils import RedisClient
-from netl2api.lib.config import get_netl2server_cfg, setup_netl2server_logger, setup_persistence_ctrl_logger
+from netl2api.lib.config import RedisClient, get_netl2server_cfg, setup_netl2server_logger, setup_persistence_ctrl_logger
 
 
 __all__ = ["defer_save_switch_cfg", "acquire_persistence_lock", "list_pending_persistence_jobs",
            "finish_persistence_job"]
 
 
-cfg = get_netl2server_cfg()
+cfg                 = get_netl2server_cfg()
 logger_netl2server  = setup_netl2server_logger(cfg)
 logger_persist_ctrl = setup_persistence_ctrl_logger(cfg)
-redis_cli = RedisClient()
+redis_cli           = RedisClient()
 
 
 def defer_save_switch_cfg(device=None):
     try:
         sw_persist_ctrl_db = redis_cli.get_connection()
     except Exception, e:
-        logger_netl2server.exception("Error in redis_cli connection (persistence control database)")
+        logger_netl2server.exception("Error in Redis connection (persistence control database)")
         return
     sw_persist_ctrl_db.incr("rwopts:%s:counter" % device, amount=1)
 
@@ -49,7 +48,7 @@ def acquire_persistence_lock(device=None):
     try:
         sw_persist_ctrl_db = redis_cli.get_connection()
     except Exception, e:
-        logger_persist_ctrl.exception("Error in redis_cli connection (persistence control database)")
+        logger_persist_ctrl.exception("Error in Redis connection (persistence control database)")
         return
     persistence_daemon_lock = sw_persist_ctrl_db.lock("rwopts:%s:lock" % device, 300)
     if persistence_daemon_lock.acquire(blocking=False) is True:
@@ -60,7 +59,7 @@ def list_pending_persistence_jobs():
     try:
         sw_persist_ctrl_db = redis_cli.get_connection()
     except Exception, e:
-        logger_persist_ctrl.exception("Error in redis_cli connection (persistence control database)")
+        logger_persist_ctrl.exception("Error in Redis connection (persistence control database)")
         return
     return [sw.split(":")[1] for sw in sw_persist_ctrl_db.keys("rwopts:*:counter") \
                 if int(sw_persist_ctrl_db.get(sw)) > 0]
@@ -70,6 +69,6 @@ def finish_persistence_job(device=None):
     try:
         sw_persist_ctrl_db = redis_cli.get_connection()
     except Exception, e:
-        logger_persist_ctrl.exception("Error in redis_cli connection (persistence control database)")
+        logger_persist_ctrl.exception("Error in Redis connection (persistence control database)")
         return
     sw_persist_ctrl_db.set("rwopts:%s:counter" % device, 0)

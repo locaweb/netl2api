@@ -24,13 +24,15 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 
 import signal
 from apscheduler.scheduler import Scheduler
+from netl2api.lib.utils import gen_context_uid
 from netl2api.lib.utils import get_switch_instance
 from netl2api.server.workers.switch_cfg_persistence_utils import *
 from netl2api.lib.config import get_netl2server_cfg, setup_persistence_ctrl_logger
 
 
-cfg    = get_netl2server_cfg()
-logger = setup_persistence_ctrl_logger(cfg)
+cfg            = get_netl2server_cfg()
+logger         = setup_persistence_ctrl_logger(cfg)
+worker_minutes = cfg.get("job.switch_cfg_persistence", "run_on_minutes")
 
 
 def worker():
@@ -42,25 +44,26 @@ def worker():
     for device in devices:
         sw_cfg_persist_lock = acquire_persistence_lock(device)
         if sw_cfg_persist_lock is None:
-            logger.warn("Could not acquire persistence lock for device '%s'" % device)
+            logger.warn("Could not acquire persistence lock for device '%s'. Probably because it's already acquired by another instance" % device)
             continue
+        context = {"CTX-UUID": gen_context_uid()}
         try:
+            logger.info("Starting persistence-job for device '%s' -- context: %s" % (device, context))
             swinst = get_switch_instance(device)
             swinst.save_config()
             finish_persistence_job(device)
         except NotImplementedError, e:
-            logger.exception("Error on saving configuration on device '%s'" % device)
+            logger.exception("Error on saving configuration on device '%s' -- context: %s" % (device, context))
             finish_persistence_job(device)
         except Exception, e:
-            logger.exception("Error on saving configuration on device '%s'" % device)
+            logger.exception("Error on saving configuration on device '%s' -- context: %s" % (device, context))
         finally:
-            if sw_cfg_persist_lock is not None:
-                sw_cfg_persist_lock.release()
-            #swinst.transport.close()
+            logger.info("Persistence for device '%s' is done -- context: %s" % (device, context))
+            sw_cfg_persist_lock.release()
+    logger.info("The persistence-control worker has just finished its job")
 
 
 def daemon():
-    worker_minutes = cfg.get("job.switch_cfg_persistence", "run_on_minutes")
     logger.info("Starting persistence-control daemon...")
     logger.info("The persistence-control worker will run on minutes '%s'..." % worker_minutes)
     sched = Scheduler()
