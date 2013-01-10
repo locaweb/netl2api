@@ -64,6 +64,12 @@ def worker():
 
 
 def daemon():
+    try:
+        from setproctitle import setproctitle
+    except ImportError:
+        pass
+    else:
+        setproctitle("netl2api [netl2server:http-daemon/job/switch-cfg-persistence]")
     logger.info("Starting persistence-control daemon...")
     logger.info("The persistence-control worker will run on minutes '%s'..." % worker_minutes)
     sched = Scheduler()
