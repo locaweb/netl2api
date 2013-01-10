@@ -59,8 +59,7 @@ def log_request_ahead(msg=None, msg_args=None):
 
 
 # Force Exception if using devices.cfg and permissions are wrong
-if cfg.get("devices", "use_redis").lower() == "false":
-    dev_cfg = get_devices_cfg()
+dev_cfg = get_devices_cfg()
 
 @get("/devices")
 @context
@@ -497,18 +496,6 @@ def start_workers():
         p_switch_cfg_persistence.start()
     else:
         logger.info("Persistence-control job is disabled")
-    if cfg.get("job.cegonha_sync_devices", "enabled") == "true":
-        p_cegonha_sync_devices = Process(target=cegonha_sync_devices.daemon,
-                                         name="netl2api [netl2server:http-daemon/job/cegonha-sync-devices]")
-        p_cegonha_sync_devices.start()
-    else:
-        logger.info("Cegonha sync-devices job is disabled")
-    if cfg.get("job.metrics", "enabled") == "true":
-        p_metrics = Process(target=metrics.daemon,
-                                         name="netl2api [netl2server:http-daemon/job/metrics]")
-        p_metrics.start()
-    else:
-        logger.info("Cegonha sync-devices job is disabled")
 
 
 def start():
