@@ -52,19 +52,18 @@ class Flex10(L2API):
 
         self.__f10_version        = None
         self._RE_F10_LIST_REC_FMT = re.compile(r"^([A-Z].+)\s+:\s(.+)$")
-        self.cache_config.update({"_show_enet_connection": { "ttl":      60,
+        self.cache_config.update({
+                                  "_show_uplinksets":      { "ttl":      300,
+                                                             "clear_on": [] },
+                                  "_show_enet_connection": { "ttl":      60,
                                                              "clear_on": ["create_vlan", "destroy_vlan",
-                                                                          "enable_vlan", "disable_vlan",
                                                                           "interface_attach_vlan", "interface_detach_vlan",
-                                                                          "lag_attach_vlan", "lag_detach_vlan",
                                                                           "_assign_new_vcprofile"] },
                                   "_show_server_ports":    { "ttl":      60,
                                                              "clear_on": ["create_vlan", "destroy_vlan",
-                                                                          "enable_vlan", "disable_vlan",
-                                                                          "interface_attach_vlan", "interface_detach_vlan",
-                                                                          "lag_attach_vlan", "lag_detach_vlan"] },
-                                  "_show_uplinksets":      { "ttl":      300,
-                                                             "clear_on": [] } })
+                                                                          "interface_attach_vlan", "interface_detach_vlan"] },
+                                  "_show_networks":        { "ttl":      60,
+                                                             "clear_on": ["create_vlan", "destroy_vlan"] } })
 
     @property
     def f10_version(self):
