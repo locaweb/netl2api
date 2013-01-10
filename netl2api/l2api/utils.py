@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 import re
 
 
-__all__ = ["LF", "CRLF", "cisco_like_runcfg_parser", "expand_vlan_ids", "expand_interface_ids"]
+__all__ = ["LF", "CRLF", "cisco_like_runcfg_parser", "expand_vlan_ids", "expand_interface_ids", "expand_int_ranges"]
 
 
 LF   = lambda l: "%s\n" % l if not l.endswith("\n") else l
@@ -34,8 +34,8 @@ CRLF = lambda l: "%s\r\n" % l if not l.endswith("\r\n") else l
 
 RE_CISCOLIKE_IF_NAME_FMT          = re.compile(r"^([a-zA-Z\-\s]+)(\d+/)?([0-9\-,]+)$")
 RE_CISCOLIKE_CFG_COMMENT          = re.compile(r"^!")
-RE_CISCOLIKE_CFG_IF_NAME          = re.compile(r"^(?:interface|vlan|lag)\s(.+)$")
-RE_CISCOLIKE_CFG_IF_DESC          = re.compile(r"^\sdescription\s(.+)$")
+RE_CISCOLIKE_CFG_IF_NAME          = re.compile(r"^(?:interface\s(.+)|lag\s(.+)|vlan\s(.+))$")
+RE_CISCOLIKE_CFG_IF_DESC          = re.compile(r"^\s+description\s(.+)$")
 RE_CISCOLIKE_CFG_IP_ADDR          = re.compile(r"^\sip\saddress\s(.+)?$")
 RE_CISCOLIKE_CFG_IF_MTU           = re.compile(r"^\smtu(\s.+)?$")
 RE_CISCOLIKE_CFG_IF_SPEED         = re.compile(r"^\sspeed\s(.+)$")
@@ -43,8 +43,10 @@ RE_CISCOLIKE_CFG_IF_DUPLEX        = re.compile(r"^\sduplex\s(.+)$")
 RE_CISCOLIKE_CFG_IF_VLAN_TAGGED   = re.compile(r"^\s(?:tagged|switchport\strunk\sallowed\svlan)\s(.+)$")
 RE_CISCOLIKE_CFG_IF_VLAN_UNTAGGED = re.compile(r"^\s(?:untagged|switchport\s(?:access|trunk\snative)\svlan)\s(.+)$")
 RE_CISCOLIKE_CFG_IF_LAG           = re.compile(r"^\s(?:channel-group|\sport-channel)\s(.+)\smode")
-RE_CISCOLIKE_CFG_IF_ADM_STATE     = re.compile(r"^\s((?:no\s)?shutdown|disable|enable)$")
-
+RE_CISCOLIKE_CFG_IF_LAG_PRIPORT   = re.compile(r"^\sprimary-port\s(.+)")
+RE_CISCOLIKE_CFG_IF_LAG_PORTS     = re.compile(r"^\sports\s(.+)")
+RE_CISCOLIKE_CFG_IF_ADM_STATE     = re.compile(r"^\s+((?:no\s)?shutdown|disable|enable)$")
+RE_CISCOLIKE_CFG_IF_INLINE_NAME   = re.compile(r"^([0-9]+)\sname(.+)$")
 
 def cisco_like_runcfg_parser(rawruncfg=None):
     currnt_if_name = None
@@ -54,7 +56,9 @@ def cisco_like_runcfg_parser(rawruncfg=None):
             continue
         m = RE_CISCOLIKE_CFG_IF_NAME.search(runcfg_ln)
         if m:
-            currnt_if_name = m.group(1).strip()
+            #currnt_if_name = m.group(1).strip()
+            currnt_if_name = m.group(1) or m.group(2) or m.group(3)
+            currnt_if_name = currnt_if_name.strip()
             parsed_runcfg[currnt_if_name] = {}
             continue
         m = RE_CISCOLIKE_CFG_IF_DESC.search(runcfg_ln)
@@ -94,6 +98,14 @@ def cisco_like_runcfg_parser(rawruncfg=None):
         m = RE_CISCOLIKE_CFG_IF_LAG.search(runcfg_ln)
         if m:
             parsed_runcfg[currnt_if_name]["lag"] = m.group(1).strip()
+            continue
+        m = RE_CISCOLIKE_CFG_IF_LAG_PRIPORT.search(runcfg_ln)
+        if m:
+            parsed_runcfg[currnt_if_name]["lag_primary_port"] = m.group(1).strip()
+            continue
+        m = RE_CISCOLIKE_CFG_IF_LAG_PORTS.search(runcfg_ln)
+        if m:
+            parsed_runcfg[currnt_if_name]["lag_ports"] = m.group(1).strip()
             continue
         m = RE_CISCOLIKE_CFG_IF_ADM_STATE.search(runcfg_ln)
         if m:
