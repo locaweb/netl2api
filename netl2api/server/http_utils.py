@@ -55,11 +55,12 @@ def reply_json(f):
 def context(f):
     @wraps(f)
     def inject_ctx(*args, **kwargs):
-        truncate = lambda i: i if len(i) <= 25 else "%s..." % i[:25]
-        context  = { "CTX-UUID":                gen_context_uid(),
-                     "HTTP.ENV.REQUEST_METHOD": request.environ.get("REQUEST_METHOD"),
-                     "HTTP.ENV.REMOTE_ADDR":    request.environ.get("REMOTE_ADDR"),
-                     "HTTP.ENV.PATH_INFO":      request.environ.get("PATH_INFO") }
+        truncate = lambda i: i if len(i) <= 40 else "%s..." % i[:40]
+        context  = { "CTX-UUID":                 gen_context_uid(),
+                     "HTTP.ENV.SERVER_PROTOCOL": request.environ.get("SERVER_PROTOCOL"),
+                     "HTTP.ENV.REQUEST_METHOD":  request.environ.get("REQUEST_METHOD"),
+                     "HTTP.ENV.REMOTE_ADDR":     request.environ.get("REMOTE_ADDR"),
+                     "HTTP.ENV.PATH_INFO":       request.environ.get("PATH_INFO") }
         if request.headers.get("X-Real-IP"):
             context["HTTP.ENV.X-Real-IP"] = request.headers.get("X-Real-IP")
         if request.headers.get("X-Forwarded-For"):
