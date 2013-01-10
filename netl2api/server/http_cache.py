@@ -38,10 +38,10 @@ except ImportError:
 __all__ = ["cached", "invalidate_cache"]
 
 
-cfg    = get_netl2server_cfg()
-logger = setup_netl2server_logger(cfg)
+cfg          = get_netl2server_cfg()
+logger       = setup_netl2server_logger(cfg)
 cache_enable = cfg.get("cache", "enabled") == "true"
-redis_cli = RedisClient()
+redis_cli    = RedisClient()
 
 
 def cached(ttl=600):
@@ -63,9 +63,9 @@ def cached(ttl=600):
             cache_rkey    = "cache:%s:%s" % (cache_key, sha1(cache_subkey).hexdigest())
             cached_r      = cache_db.get(cache_rkey)
             if cached_r is not None:
-                #logger.debug("Cache HIT -- context %s" % context)
+                logger.info("Cache HIT -- context: %s" % request["context"])
                 response.set_header("X-Cached", "True")
-                response.set_header("Cache-Control", "max-age=%s, must-revalidate" % int(cache_db.ttl(cache_rkey)))
+                response.set_header("Cache-Control", "max-age=%s, must-revalidate" % int(cache_db.ttl(cache_rkey) or 0))
                 return loads(cached_r)
             #logger.debug("Cache MISS (calling %s()) -- context %s" % (f_name, context))
             r = f(*args, **kwargs)
