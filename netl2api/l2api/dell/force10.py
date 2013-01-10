@@ -138,30 +138,30 @@ class Force10(L2API):
             m = self._RE_F10_LIST_REC_FMT.search(sh_sys_ln)
             if m:
                 system_stack_info[m.group(1).strip().lower().replace(" ", "_")] = m.group(2).strip()
-        mp = RE_SH_SYSTEM_STACK_UNIT_psu.findall(raw_show_system)
-        if mp:
-            system_stack_info["power_supplies"] = {}
-            for p in mp:
-                system_stack_info["power_supplies"]["%s.%s" % (p[0].strip(), p[1].strip())] = {
-                    "unit_id":    p[0].strip(),
-                    "bay_id":     p[1].strip(),
-                    "status":     p[2].strip().lower(),
-                    "type":       p[3].strip(),
-                    "fan_status": p[4].strip().lower(),
-                }
-        mf = RE_SH_SYSTEM_STACK_UNIT_fan.findall(raw_show_system)
-        if mf:
-            system_stack_info["fans"] = {}
-            for f in mf:
-                system_stack_info["fans"]["%s.%s" % (f[0].strip(), f[1].strip())] = {
-                    "unit_id":     f[0].strip(),
-                    "bay_id":      f[1].strip(),
-                    "tray_status": f[2].strip().lower(),
-                    "fan0":        f[3].strip().lower(),
-                    "fan0_speed":  f[4].strip(),
-                    "fan1":        f[5].strip().lower(),
-                    "fan1_speed":  f[6].strip(),
-                }
+        # mp = RE_SH_SYSTEM_STACK_UNIT_psu.findall(raw_show_system)
+        # if mp:
+        #     system_stack_info["power_supplies"] = {}
+        #     for p in mp:
+        #         system_stack_info["power_supplies"]["%s.%s" % (p[0].strip(), p[1].strip())] = {
+        #             "unit_id":    p[0].strip(),
+        #             "bay_id":     p[1].strip(),
+        #             "status":     p[2].strip().lower(),
+        #             "type":       p[3].strip(),
+        #             "fan_status": p[4].strip().lower(),
+        #         }
+        # mf = RE_SH_SYSTEM_STACK_UNIT_fan.findall(raw_show_system)
+        # if mf:
+        #     system_stack_info["fans"] = {}
+        #     for f in mf:
+        #         system_stack_info["fans"]["%s.%s" % (f[0].strip(), f[1].strip())] = {
+        #             "unit_id":     f[0].strip(),
+        #             "bay_id":      f[1].strip(),
+        #             "tray_status": f[2].strip().lower(),
+        #             "fan0":        f[3].strip().lower(),
+        #             "fan0_speed":  f[4].strip(),
+        #             "fan1":        f[5].strip().lower(),
+        #             "fan1_speed":  f[6].strip(),
+        #         }
         return system_stack_info
 
     def _s_series_show_boot_system(self, stack_unit=0):
@@ -210,7 +210,7 @@ class Force10(L2API):
                                         else interfaces_status_info[intf_id]["speed"],
                 "configured_duplex": "auto",
                 "duplex":            interfaces_status_info[intf_id]["duplex"].lower(),
-                "enabled":           intf_attrs.get("adm_state", "").lower() == "no shutdown",
+                "enabled":           intf_attrs.get("adm_state", "no shutdown").lower() == "no shutdown",
                 "status":            interfaces_status_info[intf_id]["status"].lower(),
             }
         return interfaces_info
@@ -243,16 +243,28 @@ class Force10(L2API):
 
     def show_arp(self, interface_id=None):
         arp_info     = {}
-        show_arp_cmd = "show arp"
+        show_arp_cmd = "show mac-address-table"
         if interface_id is not None:
             interface_id = parse_interface_id(self.transport, interface_id)
-            show_arp_cmd = "show arp interface %s" % interface_id
-        m = RE_SH_ARP.findall(self.transport.execute(show_arp_cmd))
-        for n in m:
-            intf_id = n[2].strip()
-            if not arp_info.has_key(intf_id):
-                arp_info[intf_id] = []
-            arp_info[intf_id].append(n[1].strip())
+            show_arp_cmd = "show mac-address-table interface %s" % interface_id
+        m = self.transport.execute(show_arp_cmd).splitlines()[1:]
+        for mm in m:
+            spl     = mm.split("\t")
+            intf_id = spl[3].strip()
+            mac     = spl[1].strip()
+            try:
+                vlan = int(spl[0].strip())
+            except (ValueError, IndexError):
+                vlan = None
+            if not arp_info.has_key(mac):
+                arp_info[mac] = { "vlan":      None,
+                                  "lag":       None,
+                                  "interface": None }
+            if intf_id.lower().startswith("po"):
+                arp_info[mac]["lag"] = int(intf_id.lower().replace("po", ""))
+            else:
+                arp_info[mac]["interface"] = intf_id
+            arp_info[mac]["vlan"] = vlan
         return arp_info
 
     def show_uplinks(self):
@@ -279,7 +291,7 @@ class Force10(L2API):
             vln_id = int(vln_id.split()[1])
             vlan_info[vln_id] = {
                 "description": vln_attrs.get("description"),
-                "enabled":     vln_attrs.get("adm_state", "").lower() == "no shutdown",
+                "enabled":     vln_attrs.get("adm_state", "no shutdown").lower() == "no shutdown",
                 "attached_interfaces": {},
                 "attached_lags":       {}
             }
@@ -323,7 +335,7 @@ class Force10(L2API):
                 continue
             lag_info[lg_id] = {
                 "description": intf_attrs.get("description"),
-                "enabled":     intf_attrs.get("adm_state", "").lower() == "no shutdown",
+                "enabled":     intf_attrs.get("adm_state", "no shutdown").lower() == "no shutdown",
                 "attached_interfaces": [],
             }
         self._show_lag_get_interfaces(lag_info, interfaces)

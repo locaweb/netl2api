@@ -27,7 +27,7 @@ import re
 
 __all__ = ["RE_SH_VERSION", "RE_SH_OS_VERSION", "RE_SH_BOOT_SYSTEM_STACK_UNIT",
            "RE_SH_SYSTEM_BRIEF_online_stack", "RE_SH_SYSTEM_STACK_UNIT_psu",
-           "RE_SH_SYSTEM_STACK_UNIT_fan", "RE_SH_ARP", "RE_SH_INTERFACE_STATUS",
+           "RE_SH_SYSTEM_STACK_UNIT_fan", "RE_SH_INTERFACE_STATUS",
            "RE_SH_LLDP_NEIGHBORS"]
 
 
@@ -66,13 +66,6 @@ RE_SH_SYSTEM_BRIEF_online_stack = re.compile(r"(?P<unit_id>\d+)\s+(?P<unit_type>
 # -- fan and power supply
 RE_SH_SYSTEM_STACK_UNIT_psu = re.compile(r"\s+(\d+)\s+(\d+)\s+([a-zA-Z]+)\s+([a-zA-Z]+)\s+([a-zA-Z]+)")
 RE_SH_SYSTEM_STACK_UNIT_fan = re.compile(r"\s+(\d+)\s+(\d+)\s+([a-zA-Z]+)\s+([a-zA-Z]+)\s+(\d+)\s+([a-zA-Z]+)\s+(\d+)")
-
-
-# show arp
-RE_SH_ARP = re.compile(r"""
-                      ((?:\d{1,3}\.){3}\d{1,3})\s+(?:\d+|-)\s+
-                      ((?:[a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2})\s+
-                      ([a-zA-Z]+\s*\d+(?:/\d+)?)""", re.VERBOSE)
 
 
 # show interfaces status

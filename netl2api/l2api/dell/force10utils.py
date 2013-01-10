@@ -41,7 +41,7 @@ def parse_interface_id(transport, interface_id):
         raise Force10InvalidParam("Invalid interface => '%s'" % interface_id)
     check_stackunit_id(stack)
     check_port_id(port)
-    switch_interface_id = get_short_ifname(get_interface_name(transport, stack, port))
+    switch_interface_id = get_short_ifname(get_interface_name(transport, stack, port)).lower()
     if interface_id != switch_interface_id:
         raise Force10InvalidParam("No such interface => '%s'" % interface_id)
     return switch_interface_id
@@ -54,4 +54,4 @@ def get_interface_name(transport, stack, port):
     return " ".join(interface.split(" ")[:2])
 
 
-get_short_ifname = lambda i: ("%s %s" % (i.split(" ")[0][:2], i.split(" ")[1])).capitalize()
+get_short_ifname = lambda i: ("%s %s" % (i.split(" ")[0][:2], i.split(" ")[1])).lower()
