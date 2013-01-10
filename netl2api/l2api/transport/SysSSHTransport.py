@@ -28,7 +28,6 @@ from netl2api.l2api.exceptions import *
 from netl2api.lib.utils import get_context_uid
 from netl2api.l2api.transport import L2Transport
 from netl2api.l2api.transport.SystemSSH import SystemSSH, SSHAuthenticationFailed
-from netl2api.lib.metrics import conntimeit
 
 try:
     from cStringIO import StringIO
@@ -73,7 +72,6 @@ class SysSSH(L2Transport):
             buff.write(connection.recv(8192))
             time.sleep(0.05) # give some time to kernel fill the buffer - next recv
 
-    @conntimeit
     def _execute(self, connection=None, cmd=None, interactions=None):
         super(SysSSH, self)._execute(connection=connection, cmd=cmd, interactions=interactions)
         context     = {"CTX-UUID": get_context_uid()}

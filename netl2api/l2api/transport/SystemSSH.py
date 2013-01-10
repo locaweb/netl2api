@@ -33,7 +33,6 @@ import signal
 import select
 import resource
 import collections
-from netl2api.lib.metrics import functimeit
 
 try:
     from cStringIO import StringIO
@@ -160,7 +159,6 @@ class SystemSSH(object):
             return False
         return True
 
-    @functimeit
     def open_session(self):
         try:
             self._check_child_basic()
@@ -334,7 +332,6 @@ class SystemSSH(object):
         self._ssh_master_pty_fd = None
         self.shell_prompt       = None
 
-    @functimeit
     def close(self):
         try:
             self._check_child_state()
