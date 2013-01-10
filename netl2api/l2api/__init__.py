@@ -90,9 +90,7 @@ class L2API(L2APIAutoCache):
                                  "clear_on": [] },
             "show_interfaces": { "ttl":      60,
                                  "clear_on": ["enable_interface", "disable_interface",
-                                              "change_interface_description",
-                                              "interface_attach_vlan", "interface_detach_vlan",
-                                              "lag_attach_interface", "lag_detach_interface"] },
+                                              "change_interface_description"] },
             "show_lldp":       { "ttl":      60,
                                  "clear_on": [] },
             "show_arp":        { "ttl":      60,
@@ -109,8 +107,7 @@ class L2API(L2APIAutoCache):
                                  "clear_on": ["create_lag", "destroy_lag",
                                               "enable_lag", "disable_lag",
                                               "change_lag_description",
-                                              "lag_attach_interface", "lag_attach_interface",
-                                              "lag_attach_vlan", "lag_detach_vlan"] },
+                                              "lag_attach_interface", "lag_detach_interface"] },
         }
 
 

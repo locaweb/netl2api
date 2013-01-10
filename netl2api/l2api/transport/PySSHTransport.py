@@ -43,6 +43,7 @@ class PySSH(L2Transport):
     def __init__(self, port=22, *args, **kwargs):
         port = port if port is not None else 22
         super(PySSH, self).__init__(port=port, *args, **kwargs)
+        self.transport.crlf = LF
         self._ssh = None
         self._recv_interactions_wait = 0.01
         self._recv_interactions_max  = (self.transaction_timeout / self._recv_interactions_wait)
@@ -96,7 +97,7 @@ class PySSH(L2Transport):
         logger      = self._logger
         buff        = StringIO()
         interaction = 0
-        connection.send(LF(cmd))
+        connection.send(self.crlf(cmd))
         while not self.prompt_mark_re.search(buff.getvalue()):
             try:
                 self._recvall_with_timeout(connection=connection, buff=buff)
@@ -110,7 +111,7 @@ class PySSH(L2Transport):
                 i_res_re     = re.compile(i_res)
                 if i_res_re.search(buff.getvalue()):
                     logger.info("Pattern '%s' matched; Sending reply-command '%s' -- context: %s" % (i_res, i_cmd, context))
-                    connection.send(LF(i_cmd))
+                    connection.send(self.crlf(i_cmd))
                     interaction += 1
         cmdout = "\r\n".join(buff.getvalue().splitlines()[1:-1])
         buff.close()

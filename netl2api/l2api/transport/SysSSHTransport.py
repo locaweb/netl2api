@@ -24,12 +24,11 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 
 import re
 import time
-from netl2api.l2api.utils import CRLF
 from netl2api.l2api.exceptions import *
 from netl2api.lib.utils import get_context_uid
 from netl2api.l2api.transport import L2Transport
 from netl2api.l2api.transport.SystemSSH import SystemSSH, SSHAuthenticationFailed
-
+from netl2api.lib.metrics import conntimeit
 
 try:
     from cStringIO import StringIO
@@ -74,13 +73,14 @@ class SysSSH(L2Transport):
             buff.write(connection.recv(8192))
             time.sleep(0.05) # give some time to kernel fill the buffer - next recv
 
+    @conntimeit
     def _execute(self, connection=None, cmd=None, interactions=None):
         super(SysSSH, self)._execute(connection=connection, cmd=cmd, interactions=interactions)
         context     = {"CTX-UUID": get_context_uid()}
         logger      = self._logger
         buff        = StringIO()
         interaction = 0
-        connection.send(CRLF(cmd))
+        connection.send(self.crlf(cmd))
         while not self.prompt_mark_re.search(buff.getvalue()):
             try:
                 self._recvall_with_timeout(connection=connection, buff=buff)
@@ -94,7 +94,7 @@ class SysSSH(L2Transport):
                 i_res_re     = re.compile(i_res)
                 if i_res_re.search(buff.getvalue()):
                     logger.info("Pattern '%s' matched; Sending reply-command '%s' -- context: %s" % (i_res, i_cmd, context))
-                    connection.send(CRLF(i_cmd))
+                    connection.send(self.crlf(i_cmd))
                     interaction += 1
         cmdout = "\r\n".join(buff.getvalue().splitlines()[1:-1])
         buff.close()

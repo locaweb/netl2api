@@ -108,6 +108,7 @@ class L2APIAutoCache(object):
             return self._cached_attrs[cache_f_key][cache_arg_key]["value"]
         if cache_arg_key is not cache_noarg_key and \
                 self._cached_attrs[cache_f_key].has_key(cache_noarg_key) and \
+                type(self._cached_attrs[cache_f_key][cache_noarg_key]["value"]) is dict and \
                 self._cached_attrs[cache_f_key][cache_noarg_key]["value"].has_key(cache_arg_key) and \
                 cache_is_valid(self._cached_attrs[cache_f_key][cache_noarg_key]):
             return { cache_arg_key: self._cached_attrs[cache_f_key][cache_noarg_key]["value"][cache_arg_key] }

@@ -28,6 +28,7 @@ import socket
 import logging
 from functools import wraps
 from netl2api.l2api.exceptions import *
+from netl2api.l2api.utils import LF, CRLF
 from netl2api.lib.utils import get_context_uid
 from errno import EPIPE, ECONNABORTED, ECONNRESET, ENETRESET
 
@@ -51,8 +52,9 @@ def l2api_retry(times=1):
                         raise e
                     count += 1
                     self.close()
-                    if isinstance(e, socket.timeout):
-                        time.sleep(2)
+                    #if isinstance(e, socket.timeout):
+                    #    time.sleep(2)
+                    time.sleep(3)
                 else:
                     return r
         return retry_exec
@@ -62,7 +64,6 @@ def l2api_retry(times=1):
 class L2Transport(object):
     """
         SSH transport (encrypted) for L2API.
-
 
         :host: SSH server (network switch fqdn/ip-address).
             - type: str.
@@ -145,9 +146,12 @@ class L2Transport(object):
         self.port     = port
         self.username = username
         self.passwd   = passwd
+        self.crlf     = CRLF
         self.prompt_mark = prompt_mark
         # self.prompt_mark_re = re.compile(r"(?:\r)?\n(?:%s|%s|[a-z0-9]+(?:%s)?)?%s\s*$" % \
         #         (self.host, self.host.split(".")[0], self.host.split(".")[0][-1:], self.prompt_mark), re.IGNORECASE)
+        #self.prompt_mark_re = re.compile(r"(?:\r)?\n(?:%s|%s|[a-z0-9\@\-]+(?:%s)?)?%s\s*$" % \
+        #        (self.host, self.host.split(".")[0], self.host.split(".")[0][-1:], self.prompt_mark), re.IGNORECASE)
         self.prompt_mark_re  = re.compile(r"(?:\r)?\n(?:[a-z0-9\.\-\@_]+)?\s*%s\s*$" % self.prompt_mark, re.IGNORECASE)
         self.error_mark      = error_mark
         self.error_mark_re   = re.compile(r"(%s.+)" % self.error_mark)
@@ -195,15 +199,16 @@ class L2Transport(object):
 
     def _execute(self, connection=None, cmd=None, interactions=None):
         """
-        Execute command 'cmd' (and expect/execute 'interactions') through 'connection'
+        Execute command 'cmd' (+'interactions') using 'connection' object
         """
         context = {"CTX-UUID": get_context_uid()}
-        
-        self._logger.info("%s(%s@%s:%s): Command '%s' was invoked with interactions: %s -- context: %s" % \
-        (self.__class__.__name__, self.username, self.host, self.port, cmd, \
-            "; ".join(["'%s'->'%s'" % (i_res, i_cmd) for i_res, i_cmd in interactions]) if interactions else "''", context))
 
-    @l2api_retry(times=3)
+        self._logger.info("%s(%s@%s:%s): Command '%s' invoked with interactions: %s -- context: %s" % \
+        (self.__class__.__name__, self.username, self.host, self.port, cmd, \
+            "; ".join(["'%s'->'%s'" % (i_res, i_cmd) for i_res, i_cmd in interactions]) \
+            if interactions else "''", context))
+
+    @l2api_retry(times=2)
     def execute(self, cmd=None, interactions=None):
         """ Execute commands on remote host
 

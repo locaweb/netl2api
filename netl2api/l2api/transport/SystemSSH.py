@@ -28,11 +28,12 @@ import sys
 import pty
 import time
 import errno
-import shlex
+#import shlex
 import signal
 import select
 import resource
 import collections
+from netl2api.lib.metrics import functimeit
 
 try:
     from cStringIO import StringIO
@@ -61,10 +62,16 @@ class SystemSSH(object):
         self._ssh_child_pid       = None
         self._ssh_master_pty_fd   = None
         self.shell_prompt         = None
-        self._ssh_cmd = shlex.split("""ssh -t '-o ConnectTimeout=%s' '-o Protocol=2,1'
-                            '-o StrictHostKeyChecking=no' '-o PreferredAuthentications=password,keyboard-interactive'
-                            '-o NumberOfPasswordPrompts=1' '-o ControlMaster=no' '-o LogLevel=INFO' '-p %s' %s@%s""" \
-                            % (self._ssh_connect_timeout, self.port, self.username, self.host))
+        # Causing some problems with python26 on Debian6:
+        # -- 'execve() argument 1 must be encoded string without NULL bytes, not str'
+        #self._ssh_cmd = shlex.split("ssh -t '-o ConnectTimeout=%s' '-o Protocol=2,1' '-o StrictHostKeyChecking=no' \
+		#		    '-o PreferredAuthentications=password,keyboard-interactive' \
+        #           '-o NumberOfPasswordPrompts=1' '-o ControlMaster=no' '-o LogLevel=INFO' '-p %s' %s@%s" \
+        #                  % (self._ssh_connect_timeout, self.port, self.username, self.host))
+        self._ssh_cmd = ["ssh", "-t", "-o ConnectTimeout=%s" % self._ssh_connect_timeout, "-o Protocol=2,1",
+                         "-o StrictHostKeyChecking=no", "-o PreferredAuthentications=password,keyboard-interactive",
+                         "-o NumberOfPasswordPrompts=1", "-o ControlMaster=no", "-o LogLevel=INFO",
+                         "-p %s" % self.port, "%s@%s" % (self.username, self.host)]
 
     @property
     def opened(self):
@@ -153,6 +160,7 @@ class SystemSSH(object):
             return False
         return True
 
+    @functimeit
     def open_session(self):
         try:
             self._check_child_basic()
@@ -174,14 +182,16 @@ class SystemSSH(object):
         else:
             self._ssh_master_pty_fd = master_pty_fd
             self._ssh_child_pid     = child_pid
-            time.sleep(0.05) # give time to kernel fork the process
             self._ssh_auth()
 
     def _spawn_ssh(self):
         self._close_fds()
-        time.sleep(0.1) # wait the parent
-        os.execvpe(self._ssh_cmd[0], self._ssh_cmd, self._get_env())
-        sys.exit(127)
+        sys.stdout.flush()
+        sys.stderr.flush()
+        try:
+            os.execvpe(self._ssh_cmd[0], self._ssh_cmd, self._get_env())
+        except Exception, e:
+            sys.exit(127)
 
     @staticmethod
     def _close_fds():
@@ -199,8 +209,9 @@ class SystemSSH(object):
     #     os.dup2(to, stderr_fd)
 
     def _get_env(self):
-        env = os.environ
-        if not env.has_key("PATH"):
+        env = {}
+        env.update(os.environ)
+        if not env.get("PATH"):
             env["PATH"] = self.path
         return env
 
@@ -231,7 +242,7 @@ class SystemSSH(object):
 
     def _ssh_auth_send_passwd(self):
         self.send("%s\r\n" % self.passwd)
-        time.sleep(0.1)
+        time.sleep(0.2)
 
     def _ssh_auth_wait_shell_prompt(self):
         buff           = StringIO()
@@ -240,12 +251,11 @@ class SystemSSH(object):
         crlf_sent      = False
         try:
             while True:
-                #time.sleep(0.05)
                 curr_line = None
                 prev_line = None
                 buff_recv = self.recvall()
                 buff.write(buff_recv)
-                buff_lines = buff.getvalue().split("\n") # some shells don't use CRLF
+                buff_lines = buff.getvalue().splitlines()
                 last_read_lens.append(len(buff_recv))
                 if len(buff_lines) == 0:
                     continue
@@ -288,7 +298,7 @@ class SystemSSH(object):
         else:
             if self.recv_ready() is False:
                 raise IOError("SSH file descriptor (stdout) is not ready for read operations")
-        #time.sleep(0.05) # give some time to kernel fill the buffer
+        time.sleep(0.05)
         try:
             buff = os.read(self._ssh_master_pty_fd, recv_bytes)
         except (OSError, ValueError), e:
@@ -300,7 +310,6 @@ class SystemSSH(object):
         buff = StringIO()
         while self.recv_ready() is True:
             buff.write(self.recv(8192))
-            time.sleep(0.05) # give some time to kernel fill the buffer - next recv
         return buff.getvalue()
 
     def send(self, data=""):
@@ -312,7 +321,7 @@ class SystemSSH(object):
         else:
             if self.write_ready() is False:
                 raise IOError("SSH file descriptor (stdin) is not ready for write operations")
-        #time.sleep(0.05)
+        time.sleep(0.05)
         try:
             sent_bytes = os.write(self._ssh_master_pty_fd, data)
         except (OSError, ValueError), e:
@@ -325,6 +334,7 @@ class SystemSSH(object):
         self._ssh_master_pty_fd = None
         self.shell_prompt       = None
 
+    @functimeit
     def close(self):
         try:
             self._check_child_state()
@@ -333,6 +343,7 @@ class SystemSSH(object):
         else:
             try:
                 os.kill(self._ssh_child_pid, signal.SIGTERM)
+                time.sleep(0.1)
                 os.wait()
                 os.close(self._ssh_master_pty_fd)
             except OSError:

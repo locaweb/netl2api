@@ -24,7 +24,6 @@ __copyright__ = "Copyright 2012, Locaweb IDC"
 
 import re
 import telnetlib
-from netl2api.l2api.utils import CRLF
 from netl2api.l2api.exceptions import *
 from netl2api.lib.utils import get_context_uid
 from netl2api.l2api.transport import L2Transport
@@ -59,10 +58,10 @@ class Telnet(L2Transport):
     def _telnet_login(self, connection=None):
         cmd_res = connection.expect([AUTH_LOGIN_RE], self.transaction_timeout)
         self._check_telnet_return(cmd_res=cmd_res, err_msg="Login prompt not found. Impossible to continue with authentication")
-        connection.write(CRLF(self.username))
+        connection.write(self.crlf(self.username))
         cmd_res = connection.expect([AUTH_PASSWD_RE], self.transaction_timeout)
         self._check_telnet_return(cmd_res=cmd_res, err_msg="Password prompt not found. Impossible to continue with authentication")
-        connection.write(CRLF(self.passwd))
+        connection.write(self.crlf(self.passwd))
 
     def _skip_motd(self, connection=None):
         cmd_res = connection.expect([self.prompt_mark_re], self.transaction_timeout)
@@ -84,7 +83,7 @@ class Telnet(L2Transport):
         context     = {"CTX-UUID": get_context_uid()}
         logger      = self._logger
         buff        = StringIO()
-        connection.write(CRLF(cmd))
+        connection.write(self.crlf(cmd))
         if interactions:
             for i_res, i_cmd in interactions:
                 i_res_re  = re.compile(i_res)
@@ -92,7 +91,7 @@ class Telnet(L2Transport):
                 if i_cmd_res[0] >= 0:
                     logger.info("Pattern '%s' matched; Sending reply-command '%s' -- context: %s" % (i_res, i_cmd, context))
                     buff.write(i_cmd_res[2])
-                    connection.write(CRLF(i_cmd))
+                    connection.write(self.crlf(i_cmd))
         cmd_res = connection.expect([self.prompt_mark_re], self.transaction_timeout)
         buff.write(cmd_res[2])
         try:
