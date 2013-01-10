@@ -32,15 +32,7 @@ __all__ = ["RE_SH_VERSION", "RE_SH_ARP", "RE_SH_MODULE", "RE_SH_INTERFACE_STATUS
 # show version RE (escape ALL spaces -- re.VERBOSE)
 RE_SH_VERSION = re.compile(r"""
                             (^Chassis.*|.*Serial.*|Switch.Fabric.Module.*|^(?!FE).*Version.*|System\:.*|System.uptime.*)
-                          """, (re.X | re.M))
-                        # SL M1: NI-MLX-MR Management Module Active (Serial #: N00443G00L, Part #:    35524-104A):
-                        # Boot     : Version 5.3.0T165 Copyright (c) 1996-2009 Brocade Communications Systems, Inc.
-                        # Compiled on Nov 16 2011 at 10:05:30 labeled as xmprm05300
-                        # (517880 bytes) from boot flash
-                        # Monitor  : Version 5.3.0T165 Copyright (c) 1996-2009 Brocade Communications Systems, Inc.
-                        # Compiled on Nov 16 2011 at 10:04:52 labeled as xmb05300
-                        #  (524496 bytes) from code flash
-                        #  IronWare : Version 5.3.0dT163 Copyright (c) 1996-2009 Brocade Communications Systems, Inc.
+                            """, (re.X | re.M))
 
 
 # show arp

@@ -263,7 +263,7 @@ class Force10(L2API):
             if intf_id.lower().startswith("po"):
                 arp_info[mac]["lag"] = int(intf_id.lower().replace("po", ""))
             else:
-                arp_info[mac]["interface"] = intf_id
+                arp_info[mac]["interface"] = get_short_ifname(intf_id)
             arp_info[mac]["vlan"] = vlan
         return arp_info
 

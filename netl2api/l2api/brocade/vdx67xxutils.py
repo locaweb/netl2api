@@ -27,7 +27,7 @@ from netl2api.l2api.brocade.vdx67xxchecks import *
 from netl2api.l2api.brocade.vdx67xxexceptions import *
 
 
-__all__ = ["parse_interface_id", "get_interface_name", "get_short_ifname", "expand_brocade_interface_ids"]
+__all__ = ["parse_interface_id", "get_interface_name", "get_short_ifname"]
 
 
 def parse_interface_id(transport, interface_id):
@@ -62,15 +62,15 @@ def get_interface_name(transport, rbridge, stack, port):
 get_short_ifname = lambda i: ("%s %s" % (i.split(" ")[0][:2], i.split(" ")[1])).lower()
 
 
-def expand_brocade_interface_ids(ifrange):
-    interfaces = []
-    for intf in ifrange.replace("ethernet", "").replace("ethe", "").replace(" to ", "-").strip().split():
-        if "-" in intf:
-            intf_range_start, intf_range_end   = intf.split("-")
-            intf_start_module, intf_start_port = intf_range_start.split("/")
-            intf_end_port                      = intf_range_end.split("/")[1]
-            interfaces.extend(["%s/%s" % (intf_start_module, i) for i in expand_int_ranges("%s-%s" % (intf_start_port, intf_end_port))])
-            continue
-        if intf:
-            interfaces.append(intf)
-    return interfaces
+# def expand_brocade_interface_ids(ifrange):
+#     interfaces = []
+#     for intf in ifrange.replace("ethernet", "").replace("ethe", "").replace(" to ", "-").strip().split():
+#         if "-" in intf:
+#             intf_range_start, intf_range_end   = intf.split("-")
+#             intf_start_module, intf_start_port = intf_range_start.split("/")
+#             intf_end_port                      = intf_range_end.split("/")[1]
+#             interfaces.extend(["%s/%s" % (intf_start_module, i) for i in expand_int_ranges("%s-%s" % (intf_start_port, intf_end_port))])
+#             continue
+#         if intf:
+#             interfaces.append(intf)
+#     return interfaces

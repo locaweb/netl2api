@@ -39,7 +39,8 @@ class VDX(L2API):
         self.__VENDOR__      = "BROCADE"
         self.__HWTYPE__      = "stackable_switch"
         self.prompt_mark     = "#"
-        self.error_mark      = "(?:Error:|Invalid input ->|syntax error:) "
+        #self.error_mark      = "(?:Error:|Invalid input ->|syntax error:) "
+        self.error_mark      = "(?:syntax error:) "
         self.config_term_cmd = "terminal length 0"
         super(VDX, self).__init__(*args, **kwargs)
 
@@ -58,12 +59,7 @@ class VDX(L2API):
                                interactions=[("This operation will modify your startup.*", "y")])
 
     def show_system(self):
-        #    "cpu": sys_version["control_processor"],
-        #    "platform": "%s %s" % (sys_version["sys_name"], sys_version["ftos_version"]),
-        #    "manufacturer":   "Dell inc.",
-        #    "product_name":   "Force10 %s" % sys_os_version["platform"],
-        #    "system_version": sys_version["ftos_version"],
-        pass
+        return {}
 
     def show_hostname(self):
         return self.transport.execute("show system | include \"Unit Name\"").split(":")[1].strip()
@@ -148,7 +144,7 @@ class VDX(L2API):
         # linux lldpctl like
         for intf_id, intf_attrs in lldp_info.iteritems():
             intf_id  = get_short_ifname(intf_id)
-            mac_addr = intf_attrs.get("chassis_id")
+            mac_addr = intf_attrs.get("chassis_id", "")
             lldpctl_info["lldp.%s.ttl" % intf_id]           = intf_attrs.get("remaining_life")
             lldpctl_info["lldp.%s.chassis.name" % intf_id]  = intf_attrs.get("system_name")
             lldpctl_info["lldp.%s.chassis.descr" % intf_id] = intf_attrs.get("system_description")
@@ -171,17 +167,17 @@ class VDX(L2API):
         if interface_id is not None:
             interface_id = parse_interface_id(self.transport, interface_id)
             show_arp_cmd = "show mac-address-table interface %s" % interface_id
-        m = self.transport.execute(show_arp_cmd).split('\n')[1:-1]
+        m = self.transport.execute(show_arp_cmd).splitlines()[1:-1]
         for mm in m:
-            spl = re.split('\s\s+', mm)
+            spl     = re.split(r"\s\s+", mm)
             intf_id = spl[4].strip()
-            mac = spl[1].strip().replace(".","")
-            mac = "%s:%s:%s:%s:%s:%s" % (mac[0:2],mac[2:4],mac[4:6],mac[6:8],mac[8:10],mac[10:12])
-            vlan = spl[0].strip()
+            mac     = spl[1].strip().replace(".", "")
+            mac     = "%s:%s:%s:%s:%s:%s" % (mac[0:2], mac[2:4], mac[4:6], mac[6:8], mac[8:10], mac[10:12])
+            vlan    = spl[0].strip()
             if not arp_info.has_key(mac):
                 arp_info[mac] = {}
-            arp_info[mac]['interface'] = intf_id
-            arp_info[mac]['vlan'] = vlan
+            arp_info[mac]["interface"] = intf_id
+            arp_info[mac]["vlan"]      = vlan
         return arp_info
 
     def show_uplinks(self):
@@ -273,7 +269,8 @@ class VDX(L2API):
             lag_info[lg_id] = {
                 "description":         intf_attrs.get("description"),
                 "enabled":             intf_attrs.get("adm_state", "no shutdown").lower() == "no shutdown",
-                "attached_interfaces": expand_brocade_interface_ids(intf_attrs.get("lag_ports", "")),
+                #"attached_interfaces": expand_brocade_interface_ids(intf_attrs.get("lag_ports", "")),
+                "attached_interfaces": [],
             }
         self._show_lag_get_interfaces(lag_info, interfaces)
         return lag_info
@@ -285,7 +282,6 @@ class VDX(L2API):
                             (self._RE_CMDVLAN, "description %s" % (vlan_description))]
         else:
             interactions = [(self._RE_CMDINIT, "interface vlan %s" % (vlan_id))]
-
         interactions.append((self._RE_CMDVLAN, "end"))
         self.transport.execute("configure terminal", interactions=interactions)
 
@@ -372,24 +368,24 @@ class VDX(L2API):
 
     def destroy_lag(self, lag_id=None):
         check_lag_hasnt_members(self, lag_id)
-        interactions = [(self._RE_CMDINIT, "no inteface po %s" % lag_id),
+        interactions = [(self._RE_CMDINIT, "no interface po %s" % lag_id),
                         (self._RE_CMDINIT, "end")]
         self.transport.execute("configure terminal", interactions=interactions)
 
     def interface_attach_vlan(self, interface_id=None, vlan_id=None, tagged=True):
-        interactions = []
         interface_id = parse_interface_id(self.transport, interface_id)
         check_vlan_exists(self.transport, vlan_id)
         tagged   = bool(tagged)
         vlan_tag = "tagged" if tagged is True else "untagged"
-        interactions.append((self._RE_CMDINIT, "interface %s" % interface_id))
+        interactions = [(self._RE_CMDINIT,  "interface %s" % interface_id),
+                        (self._RE_CMDIFACE, "switchport")]
         if tagged is True:
-            interactions.append((self._RE_CMDIFACE, "switchport mode trunk"))
-            interactions.append((self._RE_CMDIFACE, "switchport trunk allowed vlan add %s" % vlan_id))
+            interactions.append((self._RE_CMDIFACE, "switchport mode trunk"),
+                                (self._RE_CMDIFACE, "switchport trunk allowed vlan add %s" % vlan_id))
         else:
-            interactions.append((self._RE_CMDIFACE, "switchport mode access"))
-            interactions.append((self._RE_CMDIFACE, "switchport access vlan %s" % vlan_id))
-        interactions.append((self._RE_CMDIFACE,  "end"))
+            interactions.append((self._RE_CMDIFACE, "switchport mode access"),
+                                (self._RE_CMDIFACE, "switchport access vlan %s" % vlan_id))
+        interactions.append((self._RE_CMDIFACE, "end"))
         self.transport.execute("configure terminal", interactions=interactions)
 
     def interface_detach_vlan(self, interface_id=None, vlan_id=None, tagged=True):
@@ -423,12 +419,11 @@ class VDX(L2API):
         self.transport.execute("configure terminal", interactions=interactions)
 
     def lag_detach_vlan(self, lag_id=None, vlan_id=None, tagged=True):
-        interactions = []
         check_lag_exists(self.transport, lag_id)
         check_vlan_exists(self.transport, vlan_id)
         tagged   = bool(tagged)
         vlan_tag = "tagged" if tagged is True else "untagged"
-        interactions.append((self._RE_CMDINIT, "interface po %s" % lag_id))
+        interactions = [(self._RE_CMDINIT, "interface po %s" % lag_id)]
         if tagged is True:
             interactions.append((self._RE_CMDLAG, "switchport trunk allowed vlan remove %s" % vlan_id))
         else:
@@ -437,12 +432,12 @@ class VDX(L2API):
         self.transport.execute("configure terminal", interactions=interactions)
 
     def lag_attach_interface(self, lag_id=None, interface_id=None):
-        interactions = []
         interface_id = parse_interface_id(self.transport, interface_id)
         check_lag_exists(self.transport, lag_id)
         check_interface_isnt_in_use_by_lag(self, interface_id)
         interactions = [(self._RE_CMDINIT,  "interface %s" % interface_id),
-                        (self._RE_CMDIFACE, "channel-group %s mode active type standard" % lag_id)
+                        (self._RE_CMDIFACE, "no switchport"),
+                        (self._RE_CMDIFACE, "channel-group %s mode active type standard" % lag_id),
                         (self._RE_CMDIFACE, "end")]
         self.transport.execute("configure terminal", interactions=interactions)
 

@@ -54,12 +54,7 @@ class NetIron(L2API):
         self.transport.execute("write memory")
 
     def show_system(self):
-        #    "cpu": sys_version["control_processor"],
-        #    "platform": "%s %s" % (sys_version["sys_name"], sys_version["ftos_version"]),
-        #    "manufacturer":   "Dell inc.",
-        #    "product_name":   "Force10 %s" % sys_os_version["platform"],
-        #    "system_version": sys_version["ftos_version"],
-        pass
+        return {}
 
     def show_hostname(self):
         return self.transport.execute("show running-config | include hostname").split()[1].strip()
@@ -78,9 +73,9 @@ class NetIron(L2API):
                 elif "Switch Fabric Module" in item:
                     result["Module" + val]["uptime"] = item.strip()
                 elif "System:" in item:
-                    result["system"] = item.split(": ")[1:].strip()
+                    result["system"] = " ".join([s for s in item.split(": ")[1:]]).strip()
                 elif "System uptime" in item:
-                    result["uptime"] = item
+                    result["uptime"] = item.strip()
             return result
         return {}
 
@@ -164,16 +159,20 @@ class NetIron(L2API):
         # linux lldpctl like
         for if_name in value:
             m = value[if_name]
-            remote_cap = m["Enabled capabilities"]
-            lldp_info["lldp.%s.ttl" % if_name]           = m["Time to live"]
-            lldp_info["lldp.%s.chassis.name" % if_name]  = None
-            #lldp_info["lldp.%s.chassis.descr" % if_name] = "interface name" if 'Port ID (interface name)' in m else "MAC address"
-            lldp_info["lldp.%s.chassis.mgmt-ip" % if_name] = m["Management address (IPv4)"]
+            remote_cap = m.get("Enabled capabilities", [])
+            mac_addr   = m.get("Chassis ID (MAC address)", "").strip().strip("\"")
+            lldp_info["lldp.%s.ttl" % if_name]           = m.get("Time to live")
+            lldp_info["lldp.%s.chassis.name" % if_name]  = m.get("System name", "").strip().strip("\"")
+            lldp_info["lldp.%s.chassis.descr" % if_name] = m.get("System description", "").strip().strip("\"")
+            lldp_info["lldp.%s.chassis.mgmt-ip" % if_name] = m.get("Management address (IPv4)")
             #lldp_info["lldp.%s.chassis.id.type" % if_name] = "MAC address" if 'Chassis ID (MAC address)' in m else "Unknown"
-            lldp_info["lldp.%s.chassis.id" % if_name]      = m["Chassis ID (MAC address)"]
+            #lldp_info["lldp.%s.chassis.id" % if_name]      = m.get("Chassis ID (MAC address)")
+            lldp_info["lldp.%s.chassis.id" % if_name]      = "%s:%s:%s:%s:%s:%s" % \
+                                                                (mac_addr[0:2], mac_addr[2:4], mac_addr[5:7], mac_addr[7:9],
+                                                                 mac_addr[10:12], mac_addr[12:14])
             lldp_info["lldp.%s.chassis.mac" % if_name]     = lldp_info["lldp.%s.chassis.id" % if_name]
-            lldp_info["lldp.%s.port.ifname" % if_name]     = m["System name"] if "System name" in m else None
-            lldp_info["lldp.%s.port.descr" % if_name]      = m["System description"] if "System description" in m else None
+            lldp_info["lldp.%s.port.ifname" % if_name]     = None
+            lldp_info["lldp.%s.port.descr" % if_name]      = None
             #lldp_info["lldp.%s.chassis.ifname.type" % if_name]    = "interface name" if 'Port ID (interface name)' in m else "MAC address"
             lldp_info["lldp.%s.chassis.Router.enabled" % if_name] = "router" in remote_cap
             lldp_info["lldp.%s.chassis.Bridge.enabled" % if_name] = "bridge" in remote_cap
@@ -187,30 +186,29 @@ class NetIron(L2API):
             show_arp_cmd = "show mac-address interface %s" % interface_id
         m = self.transport.execute(show_arp_cmd).splitlines()[6:]
         for mm in m:
-            spl     = re.split("\s\s+", mm)
-            if spl[0] == 'MAC Address' or spl[0] == '':
+            spl = re.split("\s\s+", mm)
+            if spl[0] in ("", "MAC Address"):
                 continue
-
             try:
-                spl[0].split()[1].strip()
+                intf_id = spl[0].split()[1].strip()
             except:
                 intf_id = spl[1]
                 mac     = spl[0]
                 vlan    = int(spl[3].strip())
             else:
-                intf_id = spl[0].split()[1].strip()
-                mac     = spl[0].split()[0].strip().replace(".", "")
-                vlan    = int(spl[2].strip())
-
-            mac     = "%s:%s:%s:%s:%s:%s" % (mac[0:2], mac[2:4], mac[4:6], mac[6:8], mac[8:10], mac[10:12])
+                #intf_id = spl[0].split()[1].strip()
+                mac  = spl[0].split()[0].strip().replace(".", "")
+                vlan = int(spl[2].strip())
+            mac = "%s:%s:%s:%s:%s:%s" % (mac[0:2], mac[2:4], mac[4:6], mac[6:8], mac[8:10], mac[10:12])
             if not arp_info.has_key(mac):
                 arp_info[mac] = { "vlan":      None,
-            #                      "lag":       None,
+                                  "lag":       None,
                                   "interface": None }
-            #intf_lag  = self._find_interface_lag(intf_id)
-            #intf_name = intf_lag or intf_id
-            #int_key   = "lag" if intf_lag is not None else "interface"
-            arp_info[mac]['interface'] = intf_id
+            intf_lag  = self._find_interface_lag(intf_id)
+            intf_name = intf_lag or intf_id
+            int_key   = "lag" if intf_lag is not None else "interface"
+            #arp_info[mac]["interface"] = intf_id
+            arp_info[mac][int_key] = intf_name
             arp_info[mac]["vlan"]  = vlan
         return arp_info
 
