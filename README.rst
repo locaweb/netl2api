@@ -56,7 +56,7 @@ Devices List:
 
 **Example**:
 ::
-    # curl http://localhost:8080/devices | python -mjson.tool
+    curl http://localhost:8080/devices | python -mjson.tool
     [
         "bladehptest0001",
         "swdelltest0001"
@@ -71,7 +71,7 @@ Device Information:
 
 **Example**:
 ::
-    # curl http://localhost:8080/info/swdelltest0001 | python -mjson.tool
+    curl http://localhost:8080/info/swdelltest0001 | python -mjson.tool
     {
         "hostname": "aswtlabita0001",
         "l2api": {
@@ -103,7 +103,7 @@ Device Version (a.k.a. *show version*):
 
 **Example**:
 ::
-    # curl http://localhost:8080/version/swdelltest0001 | python -mjson.tool
+    curl http://localhost:8080/version/swdelltest0001 | python -mjson.tool
     {
         "boot_flash_memory": "128M",
         "build_path": "/sites/sjc/work/build/buildSpaces/build08/E8-3-10/SW/SRC/Cp_src/Tacacs",
@@ -126,7 +126,7 @@ Device System Information:
 
 **Example**:
 ::
-    # curl http://localhost:8080/system/swdelltest0001 | python -mjson.tool
+    curl http://localhost:8080/system/swdelltest0001 | python -mjson.tool
     {
         "boot": {
             "current_cfg_1": "flash://startup-config",
@@ -223,7 +223,7 @@ Device Interface(s)/Port(s) List:
 
 **Example**:
 ::
-    # curl http://localhost:8080/interfaces/swdelltest0001/Te%200/9 | python -mjson.tool
+    curl http://localhost:8080/interfaces/swdelltest0001/Te%200/9 | python -mjson.tool
     {
         "Te 0/9": {
             "configured_duplex": "auto",
@@ -247,7 +247,7 @@ Change Interface Description:
 
 **Example**:
 ::
-    # curl -v -X PUT -d interface_description="new description" http://localhost:8080/interfaces/swdelltest0001/Te%200/9/change_description
+    curl -v -X PUT -d interface_description="new description" http://localhost:8080/interfaces/swdelltest0001/Te%200/9/change_description
 
 Enable/Disable Interface:
 ~~~~~~~~~~~~~~~~~~~~~~~~~
