@@ -243,7 +243,7 @@ Change Interface Description:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - **HTTP Resquest Method**: PUT
 - **HTTP Resquest URL Suffix**: /interfaces/<device-id>/<interface-id>/change_description
-- **HTTP Resquest Params (BODY)**: interface_description=string
+- **HTTP Resquest Params (BODY, url-encoded)**: interface_description=string
 - **HTTP Return Status Code**: 200
 
 **Example**:
@@ -265,13 +265,13 @@ Attach/Dettach a VLAN to/from an Interface:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - **HTTP Resquest Method**: PUT
 - **HTTP Resquest URL Suffix**: /interfaces/<device-id>/<interface-id>/<attach_vlan|detach_vlan>
-- **HTTP Resquest Params (BODY)**: vlan_id=int, tagged=bool
+- **HTTP Resquest Params (BODY, url-encoded)**: vlan_id=int, tagged=bool
 - **HTTP Return Status Code**: 200
 
 **Example**:
 ::
-    curl -v -X PUT http://localhost:8080/interfaces/swdelltest0001/Te%200/9/enable
-    curl -v -X PUT http://localhost:8080/interfaces/swdelltest0001/Te%200/9/disable
+    curl -v -X PUT -d vlan_id=666 tagged=true http://localhost:8080/interfaces/swdelltest0001/Te%200/9/attach_vlan
+    curl -v -X PUT -d vlan_id=666 tagged=true http://localhost:8080/interfaces/swdelltest0001/Te%200/9/detach_vlan
 
 Create/Remove VLAN:
 ~~~~~~~~~~~~~~~~~~~
