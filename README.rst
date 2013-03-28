@@ -35,7 +35,7 @@ Install the dependencies (see **Requirements**) and run the following commands:
 ::
     python setup_netl2api_lib.py install
     python setup_netl2api_l2api.py install
-    python setup_netl2api_l2api.py install
+    python setup_netl2api_server.py install
 
 
 Configuration:
@@ -64,10 +64,10 @@ Devices List:
 
 Device Information:
 ~~~~~~~~~~~~~~~~~~~
-- **HTTP Method**: GET
-- **HTTP URL Suffix**: /info/<device-id>
-- **HTTP Status Code**: 200
-- **HTTP Content-Type**: application/json; charset=UTF-8
+- **HTTP Request Method**: GET
+- **HTTP Request URL Suffix**: /info/<device-id>
+- **HTTP Return Status Code**: 200
+- **HTTP Return Content-Type**: application/json; charset=UTF-8
 
 **Example**:
 ::
@@ -96,10 +96,10 @@ Device Information:
 
 Device Version (a.k.a. *show version*):
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- **HTTP Method**: GET
-- **HTTP URL Suffix**: /version/<device-id>
-- **HTTP Status Code**: 200
-- **HTTP Content-Type**: application/json; charset=UTF-8
+- **HTTP Resquest Method**: GET
+- **HTTP Resquest URL Suffix**: /version/<device-id>
+- **HTTP Return Status Code**: 200
+- **HTTP Return Content-Type**: application/json; charset=UTF-8
 
 **Example**:
 ::
@@ -119,10 +119,10 @@ Device Version (a.k.a. *show version*):
 
 Device System Information:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-- **HTTP Method**: GET
-- **HTTP URL Suffix**: /system/<device-id>
-- **HTTP Status Code**: 200
-- **HTTP Content-Type**: application/json; charset=UTF-8
+- **HTTP Resquest Method**: GET
+- **HTTP Request URL Suffix**: /system/<device-id>
+- **HTTP Return Status Code**: 200
+- **HTTP Return Content-Type**: application/json; charset=UTF-8
 
 **Example**:
 ::
@@ -216,10 +216,10 @@ Device System Information:
 
 Device Interface(s)/Port(s) List:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- **HTTP Method**: GET
-- **HTTP URL Suffix**: /interfaces/<device-id>[/interface-id]
-- **HTTP Status Code**: 200
-- **HTTP Content-Type**: application/json; charset=UTF-8
+- **HTTP Resquest Method**: GET
+- **HTTP Resquest URL Suffix**: /interfaces/<device-id>[/<interface-id>]
+- **HTTP Return Status Code**: 200
+- **HTTP Return Content-Type**: application/json; charset=UTF-8
 
 **Example**:
 ::
@@ -241,9 +241,9 @@ Device Interface(s)/Port(s) List:
 
 Change Interface Description:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- **HTTP Method**: PUT
-- **HTTP URL Suffix**: /interfaces/<device-id>/<interface-id>/change_description
-- **HTTP Status Code**: 200
+- **HTTP Resquest Method**: PUT
+- **HTTP Resquest URL Suffix**: /interfaces/<device-id>/<interface-id>/change_description
+- **HTTP Return Status Code**: 200
 
 **Example**:
 ::
@@ -251,40 +251,40 @@ Change Interface Description:
 
 Enable/Disable Interface:
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
 
 Attach/Dettach a VLAN to/from an Interface:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
 
 Create/Remove VLAN:
 ~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
 
 Enable/Disable VLAN:
 ~~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
 
 Change VLAN Description:
 ~~~~~~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
 
 Create/Remove LAG (a.k.a. port-channel or bond):
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
 
 Enable/Disable LAG:
 ~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
 
 Change LAG Description:
 ~~~~~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
 
 Attach/Dettach an Interface to/from a LAG:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
 
 Attach/Dettach a VLAN to/from a LAG:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-**TODO**
+**TO DOC**
