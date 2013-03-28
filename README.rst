@@ -244,7 +244,7 @@ Change Interface Description:
 - **HTTP Resquest Method**: PUT
 - **HTTP Resquest URL Suffix**: /interfaces/<device-id>/<interface-id>/change_description
 - **HTTP Resquest Params (BODY)**:
--- **interface_description**
+ - **interface_description**
 - **HTTP Return Status Code**: 200
 
 **Example**:
