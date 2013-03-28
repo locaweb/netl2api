@@ -3,14 +3,9 @@ NetL2API
 
 **NetL2API** (a.k.a L2API) intend to be a generic and unique API (Python/REST) for most common network/L2 operations (ports, VLANs and port-channels).
 
-It's splitted in two main modules called  '**l2api**' ('*netl2api.l2api*') and '**server**' ('*netl2api.server*').
 
-The '**l2api**' module is responsible for implement a generic Python interface for the various switch vendors (eg.: *netl2api.l2api.dell.Force10*). It's methods and signatures is defined by '*netl2api.l2api.L2API*', which every vendor-class (device plugin) should extend.
-The '**server**' module is just a HTTP wrapper for '**l2api**' and defines a REST API.
-
-
-Building Blocks:
-----------------
+Architecture:
+-------------
 
 .. image:: https://raw.github.com/locaweb/netl2api/master/doc/netl2api-blocks.png
 
@@ -30,17 +25,17 @@ Requirements:
 
 **To install these dependencies, just run**:
 ::
-    # pip install -r requirements.txt
+    pip install -r requirements.txt
 
 
 Instalation:
 ------------
 
 Install the dependencies (see **Requirements**) and run the following commands:
-
-    # python setup_netl2api_lib.py install
-    # python setup_netl2api_l2api.py install
-    # python setup_netl2api_l2api.py install
+::
+    python setup_netl2api_lib.py install
+    python setup_netl2api_l2api.py install
+    python setup_netl2api_l2api.py install
 
 
 Configuration:
