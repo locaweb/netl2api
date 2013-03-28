@@ -44,8 +44,8 @@ Configuration:
 **See comments on configuration files**: *etc/netl2api/devices.cfg*, *etc/netl2api/netl2server.cfg*
 
 
-REST API:
----------
+HTTP (REST) API:
+----------------
 
 Devices List:
 ~~~~~~~~~~~~~
