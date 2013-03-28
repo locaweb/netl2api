@@ -23,7 +23,7 @@ Requirements:
 - redis-server
 
 
-**To install these dependencies, just run**:
+**To install Python dependencies (libraries), just run**:
 ::
     pip install -r requirements.txt
 
