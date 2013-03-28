@@ -252,7 +252,14 @@ Change Interface Description:
 
 Enable/Disable Interface:
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-**TO DOC**
+- **HTTP Resquest Method**: PUT
+- **HTTP Resquest URL Suffix**: /interfaces/<device-id>/<interface-id>/<enable|disable>
+- **HTTP Return Status Code**: 200
+
+**Example**:
+::
+    curl -v -X PUT http://localhost:8080/interfaces/swdelltest0001/Te%200/9/enable
+    curl -v -X PUT http://localhost:8080/interfaces/swdelltest0001/Te%200/9/disable
 
 Attach/Dettach a VLAN to/from an Interface:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
