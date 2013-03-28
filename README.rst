@@ -1,7 +1,7 @@
 NetL2API
 ========
 
-**NetL2API** (a.k.a L2API) intend to be an unique and generic API (Python/REST) for most common network/L2 operations (ports, VLANs and port-channels).
+**NetL2API** (a.k.a L2API) intend to be a generic and unique API (Python/REST) for most common network/L2 operations (ports, VLANs and port-channels).
 
 It's splitted in two main modules called  '**l2api**' ('*netl2api.l2api*') and '**server**' ('*netl2api.server*').
 
@@ -18,11 +18,14 @@ Building Blocks:
 Requirements:
 -------------
 
-- python-bottle >= 0.11 (as a web framework)
-- python-paste (as a web server)
-- python-supay (as a daemon-manager)
-- python-apscheduler (as a scheduler for background tasks)
-- python-redis (as a cache and IPC for background tasks)
+- python-bottle >= 0.11
+- python-paste
+- python-supay
+- python-apscheduler
+- python-redis
+- python-ipaddr
+- python-setproctitle
+- redis-server
 
 
 **To install these dependencies, just run**:
@@ -30,28 +33,11 @@ Requirements:
     # pip install -r requirements.txt
 
 
-Packaging:
-----------
-
-**Debian**: NetL2API has a debian directory ready to be built. So, **under Debian-based system, just run**:
-::
-    # apt-get -y install build-essential devscripts cdbs fakeroot dh-make python-dev python-setuptools
-    # dpkg-buildpackage -us -uc
-
-
 Instalation:
 ------------
 
-Install the dependencies (see **Requirements**)
+Install the dependencies (see **Requirements**) and run the following commands:
 
-If you have executed the step above (section **Packaging**), **just install the generated packages**:
-::
-    # dpkg -i netl2api-lib_1.5.8ubuntu1_amd64.deb
-    # dpkg -i netl2api-l2api_1.5.8ubuntu1_amd64.deb
-    # dpkg -i netl2api-server_1.5.8ubuntu1_amd64.deb
-
-If not, **you can install each python-egg manually**:
-::
     # python setup_netl2api_lib.py install
     # python setup_netl2api_l2api.py install
     # python setup_netl2api_l2api.py install

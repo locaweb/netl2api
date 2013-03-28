@@ -3,5 +3,5 @@ paste
 supay
 apscheduler
 redis
+ipaddr
 setproctitle
-#ipaddr
