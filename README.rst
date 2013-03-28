@@ -49,10 +49,10 @@ REST API:
 
 Devices List:
 ~~~~~~~~~~~~~
-- **HTTP Method**: GET
-- **HTTP URL Suffix**: /devices
-- **HTTP Status Code**: 200
-- **HTTP Content-Type**: application/json; charset=UTF-8
+- **HTTP Request Method**: GET
+- **HTTP Request URL Suffix**: /devices
+- **HTTP Return Status Code**: 200
+- **HTTP Return Content-Type**: application/json; charset=UTF-8
 
 **Example**:
 ::
