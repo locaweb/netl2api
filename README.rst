@@ -273,34 +273,3 @@ Attach/Dettach a VLAN to/from an Interface:
     curl -v -X PUT -d vlan_id=666 tagged=true http://localhost:8080/interfaces/swdelltest0001/Te%200/9/attach_vlan
     curl -v -X PUT -d vlan_id=666 tagged=true http://localhost:8080/interfaces/swdelltest0001/Te%200/9/detach_vlan
 
-Create/Remove VLAN:
-~~~~~~~~~~~~~~~~~~~
-**TO DOC**
-
-Enable/Disable VLAN:
-~~~~~~~~~~~~~~~~~~~~
-**TO DOC**
-
-Change VLAN Description:
-~~~~~~~~~~~~~~~~~~~~~~~~
-**TO DOC**
-
-Create/Remove LAG (a.k.a. port-channel or bond):
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-**TO DOC**
-
-Enable/Disable LAG:
-~~~~~~~~~~~~~~~~~~~
-**TO DOC**
-
-Change LAG Description:
-~~~~~~~~~~~~~~~~~~~~~~~
-**TO DOC**
-
-Attach/Dettach an Interface to/from a LAG:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-**TO DOC**
-
-Attach/Dettach a VLAN to/from a LAG:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-**TO DOC**
